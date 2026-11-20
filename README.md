@@ -14,11 +14,13 @@ proposals are inputs to that decision, not stable public specifications.
 
 1. [`canonical-model.md`](docs/change-evidence/canonical-model.md) — the proposed
    evidence, claim, gap, attestation, and validation model.
-2. [`adapter-protocol-briefing.md`](docs/change-evidence/adapter-protocol-briefing.md)
+2. [`adapter-protocol.md`](docs/change-evidence/adapter-protocol.md) — the MVP
+   authoring shell for the protocol's conceptual core.
+3. [`adapter-protocol-briefing.md`](docs/change-evidence/adapter-protocol-briefing.md)
    — inherited constraints, provisional interfaces, and open decisions.
-3. [`theoretical-foundations.md`](docs/change-evidence/theoretical-foundations.md)
+4. [`theoretical-foundations.md`](docs/change-evidence/theoretical-foundations.md)
    — progressive background reading.
-4. [`PROVENANCE.md`](docs/change-evidence/PROVENANCE.md) — where the imported
+5. [`PROVENANCE.md`](docs/change-evidence/PROVENANCE.md) — where the imported
    research and fixtures came from.
 
 Research, captured outputs, and fixtures remain under
@@ -35,4 +37,3 @@ clojure -X:test
 ```
 
 No license has been selected yet.
-
