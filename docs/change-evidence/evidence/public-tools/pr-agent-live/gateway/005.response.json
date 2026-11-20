@@ -1,0 +1,21 @@
+{
+ "id": "09948db8-8c0e-46a3-bddc-5b4bb9efd410",
+ "object": "chat.completion",
+ "created": 1793710155,
+ "model": "claude-sonnet-5",
+ "choices": [
+  {
+   "index": 0,
+   "finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "```yaml\ncode_suggestions: []\n```"
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 17605,
+  "completion_tokens": 2047,
+  "total_tokens": 19652
+ }
+}

@@ -1,0 +1,6 @@
+{:paths ["src" "resources"]
+ :aliases
+ {:test
+  {:extra-paths ["test"]
+   :exec-fn change-evidence.test-runner/run}}}
+

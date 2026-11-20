@@ -1,0 +1,113 @@
+{
+  "chain" : {
+    "links" : [ ],
+    "mode" : "full",
+    "predecessor" : null,
+    "reason" : "first",
+    "reason/text" : "No earlier packet on this ticket was reviewed, so this packet covers the whole change."
+  },
+  "collapsed" : [ ],
+  "facts/digest" : "sha256:c96d22c396de3684b39db8e6ef69e0d07e38ab377e414632e224b92b0b273aa6",
+  "files" : [ {
+    "binary?" : false,
+    "hunks" : [ "h:92afb754", "h:67c919ec" ],
+    "path" : "skills/engineering-manager/scripts/kk-packet.sh",
+    "role" : null,
+    "stats" : {
+      "added" : 6,
+      "hunks" : 2,
+      "removed" : 4
+    },
+    "status" : "modified"
+  } ],
+  "gaps" : [ ],
+  "hunks" : {
+    "h:67c919ec" : {
+      "classification" : "code",
+      "diff/header" : "@@ -941,8 +942,9 @@ start|ensure)",
+      "display/id" : "H-002",
+      "file" : "skills/engineering-manager/scripts/kk-packet.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet.sh H2",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 942
+        },
+        "old" : {
+          "count" : 8,
+          "start" : 941
+        }
+      },
+      "patch" : "@@ -941,8 +942,9 @@ start|ensure)\n   if [ \"$external\" = true ]; then\n     [ -z \"$pr_stale\" ] \\\n       || die \"$ticket is STALE: PR #$pr_number moved to ${pr_stale:0:12}. Its review stays bound to ${review_head:0:12}; nothing is built.\" 7\n-    is_sha \"$review_head\" && is_sha \"$review_base\" \\\n-      || die \"$ticket records no pinned PR base and head; run kk-packet import again\" 4\n+    if ! { is_sha \"$review_head\" && is_sha \"$review_base\"; }; then\n+      die \"$ticket records no pinned PR base and head; run kk-packet import again\" 4\n+    fi\n     if { [ -n \"$base_ref\" ] && [ \"$base_ref\" != \"$review_base\" ]; } || { [ -n \"$head_ref\" ] && [ \"$head_ref\" != \"$review_head\" ]; }; then\n       die \"$ticket is pinned to PR #$pr_number's base and head; --base and --head cannot change them\"\n     fi\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 2
+      }
+    },
+    "h:92afb754" : {
+      "classification" : "code",
+      "diff/header" : "@@ -292,8 +292,9 @@ if [ \"$cmd\" = import ]; then",
+      "display/id" : "H-001",
+      "file" : "skills/engineering-manager/scripts/kk-packet.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 292
+        },
+        "old" : {
+          "count" : 8,
+          "start" : 292
+        }
+      },
+      "patch" : "@@ -292,8 +292,9 @@ if [ \"$cmd\" = import ]; then\n   project=$(kk-project \"$project_arg\") || exit 1\n   pr=$(gh pr view \"$pr_url\" --json number,title,body,url,author,baseRefOid,headRefOid,baseRefName,headRefName </dev/null) \\\n     || die \"gh could not read $pr_url; nothing was created\" 4\n-  is_sha \"$(jq -r '.headRefOid // \"\"' <<< \"$pr\")\" && is_sha \"$(jq -r '.baseRefOid // \"\"' <<< \"$pr\")\" \\\n-    || die \"gh returned no base and head commit for $pr_url\" 4\n+  if ! { is_sha \"$(jq -r '.headRefOid // \"\"' <<< \"$pr\")\" && is_sha \"$(jq -r '.baseRefOid // \"\"' <<< \"$pr\")\"; }; then\n+    die \"gh returned no base and head commit for $pr_url\" 4\n+  fi\n   pr_url=$(jq -r '.url' <<< \"$pr\")\n   found=$(kk_issue_list --project \"$project\" --metadata \"pr_url=$pr_url\" 2>/dev/null \\\n             | jq -r '[.issues[]? | select(.metadata.review_kind == \"external\")] | .[0].identifier // empty') \\\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 2
+      }
+    }
+  },
+  "narrative" : {
+    "context" : null,
+    "overview" : null,
+    "problem" : null,
+    "scope" : {
+      "in" : [ ],
+      "out" : [ ]
+    },
+    "sections" : [ ],
+    "thesis" : null,
+    "title" : null
+  },
+  "packet/created-at" : "2026-11-01T00:00:00Z",
+  "packet/expires-at" : "2026-11-15T00:00:00Z",
+  "packet/id" : "p-20261101-40885a",
+  "packet/url" : "https://botserver.tail86a93e.ts.net/review/p-20261101-40885a/",
+  "packet/version" : 2,
+  "range" : {
+    "base" : "5c41816df66092c69cebc8401a6fdd3d0c3f8a18",
+    "base/ref" : "2c0f3e7^",
+    "base/source" : "explicit",
+    "head" : "2c0f3e741bce2b060e266252e6ecdd0dce377af7",
+    "head/ref" : "2c0f3e7",
+    "merge-base?" : false
+  },
+  "repo/path" : "/home/multicad/multica_workspaces/personal-672708764437/per-172-a9dd976b619d/workdir/fx/repo",
+  "risks" : [ ],
+  "summary" : {
+    "stats" : {
+      "added" : 6,
+      "binary" : 0,
+      "by-classification" : {
+        "code" : 2
+      },
+      "files" : 1,
+      "hunks" : 2,
+      "removed" : 4,
+      "renamed" : 0
+    }
+  },
+  "tests" : [ ],
+  "ticket/id" : "PER-172",
+  "warnings" : [ ]
+}

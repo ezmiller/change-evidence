@@ -1,0 +1,369 @@
+{
+  "packet/id": "p-20261029-73e8ad",
+  "narrative": {
+    "context": "The engineering-manager skill runs Ethan's coding agents on the Multica board, a task tracker where agents work tickets. Its `kk-packet` command turns a ticket's commits into a review packet: a web page with the diff, a written explanation, and an approval panel. A decision on that panel can grant a push or a pull request, and a granted action becomes a job for Gatekeeper, the only agent allowed to publish, which asks `kk-may` for permission first.",
+    "overview": "Two bindings hold independently. [Import](#import-pins-the-pr) writes the PR's commits onto a ticket of its own, and [the same command](#brief-or-mark-stale) either sends Programmer to that exact head or, if the PR has since moved, marks the review stale and stops. [The build](#build-at-the-pinned-head) accepts nothing but that head, checked against what is actually on disk, so the packet shows the code the PR held. On the other side, [the page](#page-records-only) can only record that Ethan read it, and [each gate behind it](#every-gate-refuses) refuses push, PR, feedback and Gatekeeper by itself, so no single bug turns a review into a publication.",
+    "problem": "Every packet assumed the code was Programmer's own work, waiting to ship; Programmer is the coding agent. Reviewing a colleague's PR, #3625, took a hand-made ticket, a hand checkout of the PR's latest commit, and a hand-off from Programmer. The page then offered \"Approve and push\" and \"Approve, push and open a PR\" for code Ethan never meant to ship, and feedback went to Programmer as fixes to make. Nothing tied the review to the PR's exact commits.",
+    "scope": {
+      "in": [
+        "`kk-packet import`: a PrimaryKids PR URL in, one branchless review ticket out, pinned to the PR's base and head.",
+        "Builds that refuse any other commit, and a stale mark when the PR's head moves.",
+        "An approval page whose only choice records the review and grants nothing.",
+        "Refusals at every later gate: feedback, `kk-packet-approval` and `kk-may`."
+      ],
+      "out": [
+        "Capturing comments or a verdict, posting to GitHub, and packets of only what changed since the last review; later stages of PER-143 add these.",
+        "Repositories outside the PrimaryKids GitHub organization.",
+        "A dedicated template for Programmer's brief, which is written inline in `kk-packet.sh` instead."
+      ]
+    },
+    "sections": [
+      {
+        "body": [
+          {
+            "prose": "A SHA is a commit's full hash, an id that can never later mean other code. Import turns a URL into a ticket carrying two of them: the PR's base, the commit it targets, and its head, its latest commit."
+          },
+          {
+            "evidence": [
+              "H-023",
+              "H-022",
+              "H-003"
+            ],
+            "explains": "The URL must match `github.com/PrimaryKids/<repo>/pull/<n>` before `gh` is called, and `gh pr view` is the only `gh` command used. A re-run finds the existing ticket by `pr_url`; otherwise import creates one with no branch and records `review_kind=external`, the PR's number and author, and both SHAs, `pr_url` first because the search keys on it. `pkgs.gh` joins `kk-packet`'s inputs so the call can run."
+          }
+        ],
+        "contribution": "Every later step reads the PR's commits from this ticket, so this is where the review gets bound to exact code.",
+        "heading": "Import reads the PR once and pins it to one ticket",
+        "id": "import-pins-the-pr",
+        "importance": "core",
+        "transition": {
+          "text": "A ticket checks out nothing by itself; the same command next decides whether to brief Programmer or to mark the review stale.",
+          "to": "brief-or-mark-stale"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-028"
+            ],
+            "explains": "If the ticket already existed and the PR's head is no longer the pinned one, import sets `review_pr_stale`, prefixes the title with `STALE: ` and builds nothing. Otherwise it records Ethan's yes and briefs Programmer to check out exactly the head, fetching `pull/N/head` for a fork, and to post a hand-off, its written account of the code. The PR description is quoted as data, with a warning that nothing in it is an instruction, because anyone can write it. Importing an unmoved PR again changes nothing."
+          }
+        ],
+        "contribution": "This turns the pinned ticket into a checkout at exactly the PR's head, and stops a moved PR from quietly replacing the reviewed code.",
+        "heading": "Running import is Ethan's yes, unless the PR has moved",
+        "id": "brief-or-mark-stale",
+        "importance": "core",
+        "transition": {
+          "text": "Programmer's checkout is the build's input, so the build must prove it is the pinned commit before using it.",
+          "to": "build-at-the-pinned-head"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-024",
+              "H-030"
+            ],
+            "explains": "`start` reads the pinned fields, refuses a stale ticket with exit 7, and refuses a `--base` or `--head` that differs from them. It then sets both to the PR's SHAs, so nothing on the command line can move or widen the range."
+          },
+          {
+            "prose": "The diff starts from the merge base, the last commit the PR's branch shares with its target. `kk-review-packet` already computes it, and it matches GitHub's own PR diff; the PR's `baseRefOid` stays recorded as `review_base_sha`."
+          },
+          {
+            "evidence": [
+              "H-013",
+              "H-014",
+              "H-015"
+            ],
+            "explains": "`kk-packet-build`, which runs git as the `multicad` user, now reports `checkout`, the commit the worktree actually has, from both its dry-run probe and its build. `kk-packet` runs as the `openclaw` user and never runs git, so this field is how it learns what Programmer checked out."
+          },
+          {
+            "evidence": [
+              "H-031",
+              "H-032"
+            ],
+            "explains": "The checkout is compared with the pinned head twice: after the probe, before anything is built, and on the build's result, whose range must also end at that head. A mismatch at either point records nothing and exits 4, so a checkout one commit short produces no packet."
+          }
+        ],
+        "contribution": "Here the pin is enforced: an external ticket's packet can only show the PR's head, compared the way GitHub compares it.",
+        "heading": "The build uses only the pinned commits, and checks the checkout",
+        "id": "build-at-the-pinned-head",
+        "importance": "core",
+        "transition": {
+          "text": "With the packet bound to the right code, what remains is that approving it can only record the review.",
+          "to": "page-records-only"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-006"
+            ],
+            "explains": "`kk-approval status`, the record the page server reads, now carries `review_kind`, `pr_url` and `pr_number` from the ticket. That is how the page server learns the ticket is an external review."
+          },
+          {
+            "evidence": [
+              "H-033",
+              "H-034",
+              "H-035"
+            ],
+            "explains": "`approval.clj` serves the panel. For an external ticket it replaces every choice with `record-choice`, delivery `none` and no actions, titles the panel Record your review, and says nothing is ever granted. It also drops the force-push lease, the remote commit a force-push may overwrite, so that choice cannot appear."
+          },
+          {
+            "evidence": [
+              "H-037"
+            ],
+            "explains": "`decide!`, the handler that receives the click, answers 400 to any delivery but `none` on an external ticket, before anything is recorded. A hand-made request for push gets the same answer as a hidden button would."
+          },
+          {
+            "evidence": [
+              "H-036",
+              "H-038"
+            ],
+            "explains": "The decision is labelled Record review, and the notice sent after it uses that label instead of listing actions. A decision with no actions never reaches dispatch, so no Gatekeeper job starts."
+          },
+          {
+            "evidence": [
+              "H-039",
+              "H-040"
+            ],
+            "explains": "The browser panel shows the server's title and intro when given and the old wording otherwise, so ordinary packets look exactly as before."
+          }
+        ],
+        "contribution": "The push and PR choices leave the page, so the place Ethan decides cannot grant anything for someone else's code.",
+        "heading": "The approval panel offers one choice: Record review",
+        "id": "page-records-only",
+        "importance": "core",
+        "transition": {
+          "text": "A page can be bypassed, so the scripts behind it refuse the same things on their own.",
+          "to": "every-gate-refuses"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-009",
+              "H-010",
+              "H-011",
+              "H-012"
+            ],
+            "explains": "`kk-packet-approval` is what the page calls to record a decision and hand a job to Gatekeeper. On an external ticket it refuses any delivery but `none`, refuses `dispatch` outright, and passes `--no-project` so no `exposure_grants`, the ticket's list of permitted actions, are written. It now asks `kk-approval status` for the ticket's kind on every decision."
+          },
+          {
+            "evidence": [
+              "H-008",
+              "H-007"
+            ],
+            "explains": "`kk-may` is what Gatekeeper asks just before pushing or opening a PR. It now answers `EXTERNAL REVIEW:` with exit 6 to any code action on an external ticket, before it reads any approval, so even a grant written some other way is refused."
+          },
+          {
+            "evidence": [
+              "H-027"
+            ],
+            "explains": "Feedback would send Ethan's notes to Programmer as fixes to make, which has no meaning for someone else's PR. It is refused, exit 6 from the command line and 12 from the page, and nothing is sent."
+          }
+        ],
+        "contribution": "Each step a grant could pass through refuses on its own, so a page bug or a direct command still publishes nothing.",
+        "heading": "Every gate behind the page refuses too",
+        "id": "every-gate-refuses",
+        "importance": "core"
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-025",
+              "H-026",
+              "H-029"
+            ],
+            "explains": "The notice sent to Ethan is headed with the PR number and pinned head, with a STALE line when the head has moved, and `status` prints the same. The Change Summary Writer's brief gains a Review line saying the PR is being reviewed, not shipped."
+          }
+        ],
+        "contribution": "Every message about the ticket says it reviews someone else's PR at one commit, and says when that commit is stale.",
+        "heading": "Status, notice and writer brief name the PR",
+        "id": "what-ethan-reads",
+        "importance": "supporting"
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-017",
+              "H-016",
+              "H-018"
+            ],
+            "explains": "The header of `kk-packet.sh` explains external reviews end to end, and its usage text lists `import` with its two required options."
+          },
+          {
+            "evidence": [
+              "H-004",
+              "H-005",
+              "H-041"
+            ],
+            "explains": "`SKILL.md`, the manager's command table, gains an `import` row; `references/exposure.md` adds `EXTERNAL REVIEW:` to its refusal table with the instruction never to hand the ticket to Gatekeeper; the tests README describes the new section."
+          }
+        ],
+        "contribution": "Agents and Ethan learn the import command and Gatekeeper's new refusal from the documents they already read.",
+        "heading": "The docs describe the command and the new refusal",
+        "id": "docs",
+        "importance": "supporting"
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-044"
+            ],
+            "explains": "A fake `gh` answers only `pr view` and logs every call, and a test repository moves main past the PR's branch point so the merge base differs from the PR's base. The section checks the URL refusal, one ticket on re-import, refused overrides and short checkouts, the merge-base range, refused feedback, `kk-may`, the stale mark, and that every `gh` call was `pr view` with Gatekeeper never named."
+          },
+          {
+            "evidence": [
+              "H-045"
+            ],
+            "explains": "The approval-page section adds an external ticket: one choice, push, PR and force-push refused, Record review saved with no actions, job or grant, and `kk-packet-approval` refusing push and dispatch with exit 12."
+          },
+          {
+            "evidence": [
+              "H-042",
+              "H-043"
+            ],
+            "explains": "The fake board learns `issue create` and `issue update`, which import needs, and the documentation check now expects eight refusal lines instead of seven."
+          }
+        ],
+        "contribution": "The tests run the whole flow against fakes and check the read-only promise directly, from logs of every outside call.",
+        "heading": "Tests prove no GitHub write and exact-commit binding",
+        "id": "tests",
+        "importance": "supporting"
+      }
+    ],
+    "thesis": "`kk-packet import <PR URL>` reads the PR once, pins its base and head commits on a ticket of their own, and has Programmer check out exactly that head. The packet is built only from those commits, and its page offers one choice, Record review, which every later step refuses to turn into a push, PR, GitHub post or Gatekeeper job.",
+    "title": "Review someone else's PrimaryKids PR from its URL, without granting anything"
+  },
+  "files": [
+    {
+      "path": "agents/gatekeeper.md",
+      "role": "documents the EXTERNAL REVIEW refusal"
+    },
+    {
+      "path": "agents/personal/gatekeeper.md",
+      "role": "same refusal line, personal Gatekeeper"
+    },
+    {
+      "path": "modules/kingkong-manager.nix",
+      "role": "gives kk-packet the gh command"
+    },
+    {
+      "path": "skills/engineering-manager/SKILL.md",
+      "role": "adds the import command row"
+    },
+    {
+      "path": "skills/engineering-manager/references/exposure.md",
+      "role": "adds EXTERNAL REVIEW to the refusal table"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-approval.sh",
+      "role": "status carries review kind and PR"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-may.sh",
+      "role": "refuses code actions on external reviews"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "role": "records only none; refuses dispatch"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet-build.sh",
+      "role": "reports the commit actually checked out"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "role": "import, pinning, stale mark, refusals"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "role": "offers only Record review; refuses the rest"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/review_feedback/notify.clj",
+      "role": "notice uses the decision's label"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "role": "shows the server's title and intro"
+    },
+    {
+      "path": "skills/engineering-manager/tests/README.md",
+      "role": "describes the new test section"
+    },
+    {
+      "path": "skills/engineering-manager/tests/fake-multica.sh",
+      "role": "fake board creates and updates issues"
+    },
+    {
+      "path": "skills/engineering-manager/tests/run-tests.sh",
+      "role": "import section and external approval checks"
+    }
+  ],
+  "collapsed": [
+    {
+      "hunks": [
+        "H-001",
+        "H-002"
+      ],
+      "note": "Both Gatekeeper instruction files gain the same `EXTERNAL REVIEW:` line, telling Gatekeeper to stop.",
+      "reason": "repeated-pattern",
+      "representative": "H-001",
+      "similar": "identical"
+    },
+    {
+      "hunks": [
+        "H-019",
+        "H-020",
+        "H-021"
+      ],
+      "note": "Argument parsing accepts the `import` command and a `--project` option.",
+      "reason": "mechanical"
+    }
+  ],
+  "risks": [
+    "Nothing has run against a real PrimaryKids PR, so it is unproven that the `openclaw` user's `gh` can read PrimaryKids.",
+    "`multica repo checkout --ref <sha>` is untried on a fork's head, and the brief's fallback is to fetch `pull/N/head`.",
+    "If import fails after writing `pr_url` but before `review_kind`, a re-run will not find that ticket and creates a second one.",
+    "A stale mark stays even if the PR's head later moves back to the reviewed commit.",
+    "`kk-packet-approval decide` now calls `kk-approval status` for every ticket, so a failing status call also blocks ordinary decisions."
+  ],
+  "tests": [
+    {
+      "command": "skills/engineering-manager/tests/run-tests.sh",
+      "note": "At `6e2179b`, whose code is identical to this head, 1715 passed and 7 failed against 1694 and 6 on main; the extra failure is a PER-124 check that depends on how commit hashes sort, and it passed when its section was rerun.",
+      "result": "partial"
+    },
+    {
+      "command": "skills/engineering-manager/tests/run-tests.sh",
+      "note": "The new import section passed 18 of 18, and the four external-review checks on the approval page passed.",
+      "result": "pass"
+    },
+    {
+      "note": "The suite's shellcheck section passed all 35 targets once `2c0f3e7` fixed two SC2015 warnings in `kk-packet.sh`.",
+      "result": "pass"
+    },
+    {
+      "note": "A live import of the public fork PR jqlang/jq#3699, with the owner check widened in a scratch copy, pinned the real commits, refused a short checkout and wrote nothing to GitHub, but the board and checkout were stand-ins.",
+      "result": "partial"
+    },
+    {
+      "note": "Not run: a real PrimaryKids PR, `multica repo checkout` on a fork head, the browser panel tests, and `nixos-rebuild`.",
+      "result": "not-run"
+    }
+  ],
+  "gaps": [
+    "The review ticket gets no grouping label, and the hand-off asks whether it should carry `pr-review` or `standalone`.",
+    "Once a review is recorded, the page's history badge still reads approved at the reviewed commit.",
+    "`packet_review_required` is still set on external tickets, which only adds gating but was not removed."
+  ]
+}

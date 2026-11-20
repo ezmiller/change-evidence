@@ -1,0 +1,9 @@
+$ git diff --raw -z HEAD~1 HEAD | tr "\0" "\n"
+:100644 120000 17e3475 4cbb553 T
+link-me
+$ git diff HEAD~1 HEAD | grep "^diff --git"
+diff --git a/link-me b/link-me
+diff --git a/link-me b/link-me
+$ kk-review-packet build --base HEAD~1 --head HEAD
+kk-review-packet: diff and --raw disagree on how many files changed (2 patch blocks, 1 records). Refusing to guess which hunk belongs to which file.
+exit 4

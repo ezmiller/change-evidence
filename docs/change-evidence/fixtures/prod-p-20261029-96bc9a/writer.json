@@ -1,0 +1,303 @@
+{
+  "packet/id": "p-20261029-96bc9a",
+  "narrative": {
+    "context": "This tooling lets coding agents publish code Ethan reviewed. Some tickets are stacked: their branch starts from another ticket's unmerged branch, its parent. When the parent merges, StackManager runs `kk-restack` to rebase the child, replaying its commits onto the new base under new commit ids, then force-pushes, replacing the branch on origin. A ticket marked `packet_review_required` leaves the machine only as the exact commit Ethan approved in a review packet, a page `kk-packet` builds from the ticket's checkout. `kk-grant` records his permission for one action at one commit, a grant; approving a packet records grants bound to its head. `kk-may` checks for a grant at the checkout's current commit before an agent acts. For a head rewritten since review, PER-128 builds a chain-break packet, which also records the lease: the one old origin commit a force-push may replace.",
+    "overview": "The change is one handoff between tools that already existed. [Keeping the rebase local](#keep-local) puts the rebased commit on the ticket's branch and writes down origin's old head, the state the chain-break packet was built to notice. [Using main as the base](#packet-base) keeps that packet's diff true once the parent's branch is gone. Ethan's approval then lets Gatekeeper replace exactly the old head, and [settling the stack records](#settle) waits for that push before changing anything. [Refusing the lease-less grant](#refuse-sha-grant) removes the shortcut that stalled PRI-173, leaving the packet as the only route.",
+    "problem": "Nothing turned a verified rebase into something that review path could see. `kk-restack` refused reviewed tickets, because it rebases and pushes in one step, and `--dry-run` throws its result away. In PRI-173 StackManager rebased by hand on a detached HEAD, so the ticket's checkout still held the old head, and kk-packet built no chain-break packet. `kk-grant --sha <new> force-push` then recorded a grant for the new commit with no lease, so no push could use it. `kk-may` refused it because the checkout was at the old commit, and that refusal was misread as `--sha` grants not working.",
+    "scope": {
+      "in": [
+        "`kk-restack --keep-local` and the `restack_unpushed` record it writes.",
+        "kk-packet comparing against the default branch while that record says the parent merged.",
+        "`kk-dispatch` updating `parent_tip_sha` and `parent_branch` after the push lands.",
+        "`kk-grant --sha … force-push` refused, and a checkout/head mismatch note in `kk-may`.",
+        "StackManager, Gatekeeper and skill docs, and a test replaying PRI-173."
+      ],
+      "out": [
+        "Proving a rebase changed nothing, by range-diff or patch ids, which is PER-129.",
+        "Resolving rebase conflicts; `--keep-local` stops on one and leaves everything as it was.",
+        "Any weakening of exact-SHA or lease checks.",
+        "Applying the new agent text to the live agents, done with `multica agent update` after merge."
+      ]
+    },
+    "sections": [
+      {
+        "body": [
+          {
+            "prose": "`--keep-local` runs the same rebase, dropped-commit check and build verification as the normal mode, then stops short of pushing. It is a separate flag from `--dry-run`, which keeps its promise to leave nothing behind."
+          },
+          {
+            "evidence": [
+              "H-023",
+              "H-024",
+              "H-025",
+              "H-026",
+              "H-027",
+              "H-028"
+            ],
+            "explains": "The header, help text and usage line add `--keep-local` beside `--dry-run`, and the parser refuses the two together with exit 1. The header also states the new rule: with `--keep-local` the script must run in the ticket's own checkout, because that is where the result is left."
+          },
+          {
+            "evidence": [
+              "H-029"
+            ],
+            "explains": "A reviewed ticket used to stop here with exit 6, and every run needed a force-push grant from `kk-may`. `--keep-local` skips both, since it pushes nothing, and the refusal now tells StackManager to run `kk-restack <ticket> --keep-local` instead of rebasing by hand."
+          },
+          {
+            "evidence": [
+              "H-030"
+            ],
+            "explains": "Before anything moves, `--keep-local` exits 5 if another worktree has the branch checked out, or if the local branch holds commits origin lacks, since moving it would lose them. A rerun that finds the branch already at the recorded head reports `already kept locally` and exits 0."
+          },
+          {
+            "evidence": [
+              "H-031"
+            ],
+            "explains": "On success it first writes `restack_unpushed`: the new head B, the old remote head A as the lease, the new base, and whether the parent merged. Only then does `git update-ref` move the branch to B, and only if it is still where it was read, and check it out; origin is never contacted. Writing the record first means a failure leaves an unused record, not a moved branch nothing knows about."
+          }
+        ],
+        "contribution": "This is the missing step: the rebased head lands on the ticket's own branch while origin keeps the old one, which is exactly the state a chain-break packet detects.",
+        "heading": "`--keep-local` leaves the verified rebase where the review tools look",
+        "id": "keep-local",
+        "importance": "core",
+        "transition": {
+          "text": "With B on the branch, kk-packet sees a rewritten history, but it must also compare B against the right base.",
+          "to": "packet-base"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-022"
+            ],
+            "explains": "A stacked ticket's packet normally passes `--parent-branch`, so its diff starts at the parent. `parent_branch` stays set until the push lands, but a merged parent's branch is gone and its local `origin/` copy is stale. While `restack_unpushed.parent_merged` is true, kk-packet omits the flag and the base is the default branch; PER-128's build then records `not-descendant`, head B and lease A as before."
+          }
+        ],
+        "contribution": "Without this, the chain-break packet would diff B against the deleted parent's stale branch and show Ethan the wrong change.",
+        "heading": "The packet compares against main once the parent has merged",
+        "id": "packet-base",
+        "importance": "core",
+        "transition": {
+          "text": "Ethan approves that packet and Gatekeeper pushes B against its lease; what remains is to make the stack records match the published branch.",
+          "to": "settle"
+        }
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-010",
+              "H-011"
+            ],
+            "explains": "`settle_restack` acts only when the job is a force-push whose head and lease equal the record. It sets `parent_tip_sha` to the new base, deletes `parent_branch` if the parent merged, then deletes the record. If either write fails it keeps the record, so a later call retries."
+          },
+          {
+            "evidence": [
+              "H-012",
+              "H-013",
+              "H-014"
+            ],
+            "explains": "It runs at the three points where origin is known to hold B: `check --step force-push` finding it already there, `check --step pr` once `ls-remote` confirms it, and `finish --result completed`. Settling before the PR step matters because the PR reads `parent_branch` to choose its base."
+          },
+          {
+            "evidence": [
+              "H-001",
+              "H-002"
+            ],
+            "explains": "Both copies of Gatekeeper's instructions now say to read `parent_branch` after `check --step pr`, never before, because on an unpushed restack that check may clear it."
+          }
+        ],
+        "contribution": "This closes the loop: once origin holds B, the ticket stops pointing at a parent that no longer exists, and the record that drove the flow is removed.",
+        "heading": "Stack records change only after the approved push lands",
+        "id": "settle",
+        "importance": "core",
+        "transition": {
+          "text": "That is the supported path; the last part closes the one that misled PRI-173.",
+          "to": "refuse-sha-grant"
+        }
+      },
+      {
+        "body": [
+          {
+            "prose": "A force-push approved through a chain-break packet is a grant that carries its lease, so Gatekeeper can push with `--force-with-lease` and refuse if origin has moved. A `--sha` grant carries no lease, so for a force-push it was always a dead end."
+          },
+          {
+            "evidence": [
+              "H-015",
+              "H-016"
+            ],
+            "explains": "`kk-grant --sha … force-push` now exits 1 and records nothing. `--sha` names only the new head, so no job could carry the lease; the error points to approving the chain-break packet with `--lease`, or to `kk-restack --keep-local` for a restack."
+          },
+          {
+            "evidence": [
+              "H-017",
+              "H-018",
+              "H-019",
+              "H-020",
+              "H-021"
+            ],
+            "explains": "When the ticket's grants name revisions other than the checkout's head, `kk-may` adds a `Checkout/head mismatch` note: the branch and its commit, that exact-SHA grants hold at the revision they name, and a pointer to `--keep-local`. The note is built once and appended to each refusal and to the closing note. Its suggested force-push grant is now the packet-and-lease form."
+          }
+        ],
+        "contribution": "This removes the dead end PRI-173 took: a force-push can only be approved with its lease, and a stale checkout is reported as one.",
+        "heading": "The grant that could never work is refused, and mismatches are named",
+        "id": "refuse-sha-grant",
+        "importance": "core"
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-004",
+              "H-006"
+            ],
+            "explains": "Both StackManager copies gain a section for reviewed tickets: run `--keep-local` from the ticket's checkout, then `kk-packet ensure`, let Ethan approve, and never rebase by hand or ask for `kk-grant --sha … force-push`. The two texts differ only in the command line, where the personal copy passes `--workspace personal`."
+          },
+          {
+            "evidence": [
+              "H-007",
+              "H-008",
+              "H-009"
+            ],
+            "explains": "SKILL.md and stacking.md list `--keep-local` beside the other forms; stacking.md re-aligns its two command lists to fit the longer flag. stacking.md also adds a paragraph walking the same path from the local rebase to Gatekeeper's push and the metadata update."
+          }
+        ],
+        "contribution": "StackManager has to know to use the new mode and never a hand rebase, or PRI-173 repeats.",
+        "heading": "Agent and skill docs send reviewed restacks through `--keep-local`",
+        "id": "instructions",
+        "importance": "supporting"
+      },
+      {
+        "body": [
+          {
+            "evidence": [
+              "H-034",
+              "H-032"
+            ],
+            "explains": "The new section builds a bare origin, squash-merges and deletes the parent, runs `--keep-local`, and checks B is on the branch with origin byte-identical. It then builds a real packet, approves it, has Gatekeeper refuse a moved lease, and confirms `finish` settles the metadata. Six failure cases and `--dry-run` leave everything unchanged; the README describes the section."
+          },
+          {
+            "evidence": [
+              "H-033"
+            ],
+            "explains": "The fake `multica` CLI the tests run against learns `issue metadata delete`, which `settle_restack` needs to clear `parent_branch` and the record."
+          }
+        ],
+        "contribution": "The tests show the whole path, from the local rebase to settled metadata, works on a real checkout and that each failure leaves both sides alone.",
+        "heading": "A test replays PRI-173 end to end on real git",
+        "id": "tests",
+        "importance": "supporting"
+      }
+    ],
+    "since": "On p-20261028-fc577c Ethan flagged `--prepare` as too vague, asking what it prepares. This revision renames the flag to `--keep-local`, which says it keeps the verified rebase on the ticket's local branch, and the record to `restack_unpushed`, a rebase not yet pushed. The rename covers code, messages, tests and docs in one commit, and nothing else changed.",
+    "thesis": "`kk-restack --keep-local` rebases and verifies a reviewed ticket, pushes nothing, and leaves the new head on the ticket's own branch with origin untouched, so the existing chain-break packet sees the rewrite and records the right lease. Ethan's approval of that packet is then the only way the push happens, and `kk-dispatch` updates the stack records once it lands. The force-push grant that looked usable but could not be used is now refused.",
+    "title": "Rebase a reviewed stacked branch locally, and push it only on approval"
+  },
+  "files": [
+    {
+      "path": "agents/gatekeeper.md",
+      "role": "Read parent_branch after the pr check"
+    },
+    {
+      "path": "agents/personal/gatekeeper.md",
+      "role": "Personal Gatekeeper copy of that note"
+    },
+    {
+      "path": "agents/personal/stack-manager.md",
+      "role": "Personal StackManager: restacking reviewed tickets"
+    },
+    {
+      "path": "agents/stack-manager.md",
+      "role": "StackManager: restacking reviewed tickets"
+    },
+    {
+      "path": "skills/engineering-manager/SKILL.md",
+      "role": "Command table mentions `--keep-local`"
+    },
+    {
+      "path": "skills/engineering-manager/references/stacking.md",
+      "role": "Stacking reference: the unpushed restack path"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "role": "Settles stack metadata after the approved push"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-grant.sh",
+      "role": "Refuses force-push grants by `--sha`"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-may.sh",
+      "role": "Names checkout/head mismatches; suggests the lease form"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "role": "Default-branch base after a merged parent"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-restack.sh",
+      "role": "New `--keep-local`: rebase, verify, keep it local"
+    },
+    {
+      "path": "skills/engineering-manager/tests/README.md",
+      "role": "Describes the PRI-173 replay section"
+    },
+    {
+      "path": "skills/engineering-manager/tests/fake-multica.sh",
+      "role": "Fake CLI gains metadata delete"
+    },
+    {
+      "path": "skills/engineering-manager/tests/run-tests.sh",
+      "role": "PRI-173 replay on a real checkout"
+    }
+  ],
+  "collapsed": [
+    {
+      "differences": "The personal copy's line passes `--workspace personal --verify`; the other passes neither and describes the mode in more words.",
+      "hunks": [
+        "H-003",
+        "H-005"
+      ],
+      "note": "Each StackManager copy adds one `--keep-local` line to its list of kk-restack commands.",
+      "reason": "repeated-pattern",
+      "representative": "H-003",
+      "similar": "conceptual"
+    }
+  ],
+  "risks": [
+    "If the branch is checked out nowhere, `--keep-local` uses the current directory, and kk-packet finds that checkout only if it follows the `<ticket>-*/workdir/<repo>` layout.",
+    "Settling at `check --step pr` happens before kk-may checks that step, but only once origin holds the approved head, so what it records is already true.",
+    "`finish --result completed` settles on Gatekeeper's word that the push landed, as the job state already does.",
+    "If `update-ref` succeeds but the checkout after it fails, the branch sits at B without being checked out; the script exits 1 and says so.",
+    "A stale `restack_unpushed`, left by a rejected packet or new commits on top, does nothing, because settling needs an exact head and lease match."
+  ],
+  "tests": [
+    {
+      "command": "skills/engineering-manager/tests/run-tests.sh",
+      "note": "After the rename, 1658 passed and 7 failed: the 6 that also fail on main, plus one PER-124 test that fails only when two commit hashes happen to sort the other way.",
+      "result": "partial"
+    },
+    {
+      "command": "skills/engineering-manager/tests/run-tests.sh",
+      "note": "The new PER-144 section passed 21 of 21 checks on a real checkout and bare origin.",
+      "result": "pass"
+    },
+    {
+      "note": "Mutation check, run before the rename: restoring main's kk-packet.sh and kk-dispatch.sh turned the packet-base and settle checks red, 19 of 21.",
+      "result": "pass"
+    },
+    {
+      "note": "shellcheck: not on PATH here; the suite skips it and `nixos-rebuild` enforces it.",
+      "result": "not-run"
+    },
+    {
+      "note": "The browser, Squint and Caddy sections were skipped, as on main.",
+      "result": "not-run"
+    }
+  ],
+  "gaps": [
+    "A parent that moved without merging goes through `--keep-local` with kk-packet keeping `--parent-branch`, but no end-to-end test covers it.",
+    "The PER-124 test that depends on commit-hash order is left flaky; it is outside this ticket.",
+    "The agent text in `agents/*.md` reaches the live agents only when someone runs `multica agent update` after merge."
+  ]
+}

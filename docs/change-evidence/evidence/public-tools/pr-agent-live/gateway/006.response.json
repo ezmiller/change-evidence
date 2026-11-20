@@ -1,0 +1,21 @@
+{
+ "id": "d13ca68d-9ce1-43ad-ac85-4ac13a2b3010",
+ "object": "chat.completion",
+ "created": 1793710180,
+ "model": "claude-sonnet-5",
+ "choices": [
+  {
+   "index": 0,
+   "finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "```yaml\ntype:\n- Enhancement\ndescription: |\n  - Add force-push approval path for review-chain breaks (PER-128)\n  - Track `chain_break`/`remote_ref`/`remote_head` through packet build and status\n  - Require a `--lease` matching recorded remote head for force-push\n  - Render chain-break UI section and force-push confirmation in packet/approval pages\ntitle: |\n  Support approving a force-push on review-chain breaks (PER-128)\nchanges_diagram: |\n  ```mermaid\n  flowchart LR\n    buildClj[\"review-packet build.clj\\n(--remote-ref/--remote-head)\"] -- \"sets\" --> modelClj[\"model.clj\\nchain-break facts\"]\n    modelClj -- \"packet.json\" --> kkPacket[\"kk-packet.sh\\nextract chain_break/remote_*\"]\n    kkPacket -- \"events\" --> libApproval[\"lib/kk-approval.sh\\nfold chain_break/remote_*\"]\n    libApproval -- \"status facts\" --> kkApproval[\"kk-approval.sh\\nstatus output\"]\n    kkApproval -- \"facts\" --> kkPacketApproval[\"kk-packet-approval.sh\\ndecide force-push + lease\"]\n    kkPacketApproval -- \"grants\" --> gatekeeper[\"Gatekeeper\\nforce-push w/ lease\"]\n    libApproval -- \"facts\" --> approvalClj[\"approval.clj\\nchoices + lease\"]\n    approvalClj -- \"view\" --> approvalCljs[\"approval.cljs\\nUI: lease, chain-break\"]\n    modelClj -- \"chain-break\" --> renderClj[\"render.clj\\nbreak-section\"]\n    kkReviewPacket[\"kk-review-packet.sh\\nremote-ref/remote-head\"] -- \"args\" --> buildClj\n  ```\npr_files:\n- filename: |\n    skills/engineering-manager/scripts/kk-approval.sh\n  changes_title: |\n    Include chain_break/remote fields in status facts\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-packet-approval.sh\n  changes_title: |\n    Add force-push delivery choice gated by lease\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-packet.sh\n  changes_title: |\n    Extract chain-break fields and craft break brief text\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-review-packet.sh\n  changes_title: |\n    Pass remote ref/head for chain-break detection\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/lib/kk-approval.sh\n  changes_title: |\n    Fold chain_break/remote_ref/remote_head into packet state\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj\n  changes_title: |\n    Add force-push choice, lease, and chain-break service logic\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs\n  changes_title: |\n    Render chain-break facts and lease in UI\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/review-packet/build.clj\n  changes_title: |\n    Add --remote-ref/--remote-head build flags\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/review-packet/review_packet/model.clj\n  changes_title: |\n    Compute chain-break data and include in packet schema\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/review-packet/review_packet/render.clj\n  changes_title: |\n    Add chain-break section and styling to packet page\n  label: |\n    enhancement\n```"
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 12563,
+  "completion_tokens": 1345,
+  "total_tokens": 13908
+ }
+}

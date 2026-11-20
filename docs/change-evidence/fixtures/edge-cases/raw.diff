@@ -1,0 +1,64 @@
+diff --git a/.gitmodules b/.gitmodules
+index daa9b3d..0feb67c 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,3 +1,6 @@
+ [submodule "moved-sub"]
+ 	path = moved-sub
+ 	url = https://example.invalid/sub.git
++[submodule "new-sub"]
++	path = new-sub
++	url = https://example.invalid/sub.git
+diff --git a/crlf.txt b/crlf.txt
+index b77b4eb..0aa0f34 100644
+--- a/crlf.txt
++++ b/crlf.txt
+@@ -1,2 +1,2 @@
+-x
+-y
++x
++y
+diff --git a/flake.lock b/flake.lock
+index c7e6bc6..6dbbc84 100644
+--- a/flake.lock
++++ b/flake.lock
+@@ -1 +1 @@
+-lock 1
++lock 2
+diff --git a/gone.txt b/gone.txt
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/keep.txt b/kept.txt
+similarity index 83%
+rename from keep.txt
+rename to kept.txt
+index 0fdf397..e0318ee 100644
+--- a/keep.txt
++++ b/kept.txt
+@@ -3,4 +3,4 @@ b
+ c
+ d
+ e
+-f
++F
+diff --git a/moved-sub b/moved-sub
+index 9c3b58d..8f0ef3c 160000
+--- a/moved-sub
++++ b/moved-sub
+@@ -1 +1 @@
+-Subproject commit 9c3b58d9f44d72d7157c0167b77c1227e5b0cc83
++Subproject commit 8f0ef3c1f2b57f2222d56bf64223ba657e634aee
+diff --git a/new-sub b/new-sub
+new file mode 160000
+index 0000000..8f0ef3c
+--- /dev/null
++++ b/new-sub
+@@ -0,0 +1 @@
++Subproject commit 8f0ef3c1f2b57f2222d56bf64223ba657e634aee
+diff --git a/with space.txt b/with space.txt
+index 626799f..8c1384d 100644
+--- a/with space.txt	
++++ b/with space.txt	
+@@ -1 +1 @@
+-v1
++v2

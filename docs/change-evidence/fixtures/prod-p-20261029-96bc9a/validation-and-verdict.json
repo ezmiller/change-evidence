@@ -1,0 +1,57 @@
+{
+  "validation": {
+    "at": "2026-10-29T00:10:58.321588860Z",
+    "contract/version": 4,
+    "model/version": 2,
+    "ok": true,
+    "packet/id": "p-20261029-96bc9a",
+    "validator/version": 4,
+    "violations": []
+  },
+  "comprehension": {
+    "findings": [
+      {
+        "criterion": "system",
+        "request": "Add a context sentence: Gatekeeper is the agent that pushes, and it runs pushes as jobs through `kk-dispatch`, whose `check --step` and `finish` subcommands the settle section uses. Gatekeeper is first named in the overview, and `kk-dispatch` first appears in the thesis.",
+        "section": "settle",
+        "severity": "advisory"
+      },
+      {
+        "criterion": "system",
+        "request": "Say in the context paragraph that StackManager is the agent that restacks branches.",
+        "severity": "advisory"
+      }
+    ],
+    "narrative/digest": "sha256:ad7573b9b40b25df0499fb1984e70fb2cea97c68dfa5f43e338668b06387b731",
+    "packet/id": "p-20261029-96bc9a",
+    "recorded-at": "2026-10-29T00:10:58.321588860Z",
+    "understanding": {
+      "approach": "Add a keep-local mode that rebases and verifies, moves the ticket's own branch to the new head, leaves the remote on the old head and writes a record of both. The existing re-review packet then detects the rewrite, Ethan's approval of it becomes the only route to the push, the stack bookkeeping is updated only after the push lands, and the lease-less shortcut is refused. This revision only renames the earlier `--prepare` flag and `restack_prepared` record, after Ethan asked what they prepared.",
+      "in-plain-words": "Before, a branch that had already been reviewed and then needed rebasing could not be published through review, because the rebase was either thrown away or pushed straight to the remote. Now the rebase is kept on the local branch, the remote is left alone, and the review tool sees the history change and asks Ethan to approve replacing exactly the old remote commit. Only after that push succeeds are the branch's records updated. The old one-step permission, which could never work, is now refused.",
+      "peripheral": "The agent and skill docs are updated so the restack agent uses keep-local and never rebases by hand. stacking.md also re-aligns its command lists for the longer flag. Two near-identical one-line doc edits are collapsed. An end-to-end test replays PRI-173 on real git, and the fake CLI gains a metadata delete that settling needs.",
+      "problem": "There was no supported way to turn a verified rebase into something the re-review flow could see. The restack script refused reviewed tickets because it rebases and pushes in one step, and its dry-run mode throws the result away. In PRI-173 the rebase was done by hand off-branch, so the checkout kept the old head and no re-review packet was built. A force-push permission was then recorded for the new commit with no lease. The checker refused it because the checkout sat at the old commit, and that refusal was misread as exact-commit permissions not working.",
+      "reading-order": "The order follows the flow: create the local state, build the right packet from it, settle after the approved push, then close the misleading side route.",
+      "risks": "The checkout is found only if it follows the expected layout. Settling at the PR step runs before the permission check, but only once the remote holds B. Completion relies on the push agent's word that the push landed. If the branch moves but the checkout then fails, the script exits 1. A stale record is harmless because settling needs an exact match. Not covered: a parent that moved without merging has no end-to-end test, the live agents keep the old instructions until `multica agent update` runs, and an unrelated test that depends on commit-hash order is flaky. Tests: 21/21 new checks pass. The mutation check predates the rename. The 6 failures shared with main remain. shellcheck was not run.",
+      "sections": [
+        {
+          "advances": "Creates the state the re-review flow looks for: new head B on the ticket's branch, the remote still at A, and a record of an unpushed rebase naming B, the lease A and whether the parent merged. It refuses to move a branch that is checked out elsewhere or holds unpushed commits, and writes the record before moving the branch so a failure never leaves an unexplained branch move.",
+          "id": "keep-local"
+        },
+        {
+          "advances": "Once the parent has merged, its branch is gone, so the packet diffs B against main instead of the parent's stale copy, so Ethan reviews the real change.",
+          "id": "packet-base"
+        },
+        {
+          "advances": "After the approved push lands, and only if the push job's head and lease match the record, the ticket's parent bookkeeping is updated, the dead parent reference is dropped and the record is deleted. This happens before the PR step, which reads the parent to choose its base.",
+          "id": "settle"
+        },
+        {
+          "advances": "A force-push approved through the re-review packet carries its lease, so the push can fail safely if the remote has moved. A permission naming only the new commit could never do that, so it is now refused. The checker also says outright when the checkout's head differs from the commit a permission names.",
+          "id": "refuse-sha-grant"
+        }
+      ],
+      "system": "Tooling that lets coding agents publish only code Ethan has reviewed. Stacked tickets build on another ticket's unmerged branch. When that parent merges, the child is rebased, which gives its commits new ids, and then force-pushed. A reviewed ticket may leave the machine only as the exact commit Ethan approved in a review packet. Permissions are recorded per action and per commit, and approving a packet records them for its head. A checker looks for such a permission at the checkout's current commit before an agent acts. When an approved commit has been rewritten, an existing flow builds a full re-review packet that also records the lease, the one old remote commit a force-push may replace."
+    },
+    "verdict": "pass"
+  }
+}

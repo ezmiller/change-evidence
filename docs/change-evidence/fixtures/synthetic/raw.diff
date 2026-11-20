@@ -1,0 +1,13 @@
+diff --git a/empty.txt b/empty.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/logo.png b/logo.png
+index 346d7bb..a7dc397 100644
+Binary files a/logo.png and b/logo.png differ
+diff --git a/old.txt b/renamed.txt
+similarity index 100%
+rename from old.txt
+rename to renamed.txt
+diff --git a/tool.sh b/tool.sh
+old mode 100644
+new mode 100755

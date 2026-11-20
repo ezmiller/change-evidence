@@ -1,0 +1,21 @@
+{
+ "id": "258a87dc-243e-4718-817b-7919d0911c62",
+ "object": "chat.completion",
+ "created": 1793710112,
+ "model": "claude-sonnet-5",
+ "choices": [
+  {
+   "index": 0,
+   "finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "```yaml\ntype:\n- Enhancement\n- Documentation\n- Tests\ndescription: |\n  - Rename `--prepare` flag to `--keep-local` in `kk-restack`\n  - Rename `restack_prepared` metadata key to `restack_unpushed`\n  - Update all docs/skills referencing old flag and key names\n  - Update test suite messages and assertions to match renamed flag/key\ntitle: |\n  Rename kk-restack --prepare to --keep-local and restack_prepared to restack_unpushed\nchanges_diagram: |\n  ```mermaid\n  flowchart LR\n    A[\"kk-restack --prepare\"] -- \"renamed\" --> B[\"kk-restack --keep-local\"]\n    C[\"restack_prepared metadata\"] -- \"renamed\" --> D[\"restack_unpushed metadata\"]\n    B -- \"writes\" --> D\n    E[\"kk-dispatch / kk-packet / kk-may / kk-grant\"] -- \"reads\" --> D\n    F[\"docs & skills\"] -- \"updated references\" --> B\n    G[\"test suite\"] -- \"updated assertions\" --> B\n  ```\npr_files:\n- filename: |\n    skills/engineering-manager/scripts/kk-restack.sh\n  changes_title: |\n    Rename --prepare flag to --keep-local and metadata key\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-dispatch.sh\n  changes_title: |\n    Update settle_restack to use restack_unpushed key\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-packet.sh\n  changes_title: |\n    Reference restack_unpushed instead of restack_prepared\n  label: |\n    enhancement\n- filename: |\n    skills/engineering-manager/scripts/kk-grant.sh\n  changes_title: |\n    Update help text to mention --keep-local\n  label: |\n    documentation\n- filename: |\n    skills/engineering-manager/scripts/kk-may.sh\n  changes_title: |\n    Update mismatch message to use --keep-local\n  label: |\n    documentation\n- filename: |\n    skills/engineering-manager/tests/run-tests.sh\n  changes_title: |\n    Update tests for --keep-local and restack_unpushed\n  label: |\n    tests\n- filename: |\n    skills/engineering-manager/tests/README.md\n  changes_title: |\n    Document rename of flag and metadata key\n  label: |\n    documentation\n- filename: |\n    skills/engineering-manager/SKILL.md\n  changes_title: |\n    Update kk-restack flag description\n  label: |\n    documentation\n- filename: |\n    skills/engineering-manager/references/stacking.md\n  changes_title: |\n    Update stacking references to --keep-local\n  label: |\n    documentation\n- filename: |\n    agents/stack-manager.md\n  changes_title: |\n    Update restack flag and metadata references\n  label: |\n    documentation\n- filename: |\n    agents/personal/stack-manager.md\n  changes_title: |\n    Update restack flag and metadata references\n  label: |\n    documentation\n- filename: |\n    agents/gatekeeper.md\n  changes_title: |\n    Rename restack_prepared mention to restack_unpushed\n  label: |\n    documentation\n- filename: |\n    agents/personal/gatekeeper.md\n  changes_title: |\n    Rename restack_prepared mention to restack_unpushed\n  label: |\n    documentation\n```"
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 17249,
+  "completion_tokens": 1165,
+  "total_tokens": 18414
+ }
+}

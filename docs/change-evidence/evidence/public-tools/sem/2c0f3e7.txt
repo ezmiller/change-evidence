@@ -1,0 +1,5 @@
+skills/engineering-manager/scripts/kk-packet.sh
+  M  orphan      module-level
+  M  orphan      module-level
+
+2 modified across 1 file (2 modified orphans)

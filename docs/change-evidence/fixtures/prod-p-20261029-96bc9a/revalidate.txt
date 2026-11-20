@@ -1,0 +1,2 @@
+p-20261029-96bc9a  PER-144  VALID — 1 warning(s)
+  warning: The comprehension reader passed this with 2 suggestion(s): Add a context sentence: Gatekeeper is the agent that pushes, and it runs pushes as jobs through `kk-dispatch`, whose `check --step` and `finish` subcommands the settle section uses. Gatekeeper is first named in the overview, and `kk-dispatch` first appears in the thesis. Say in the context paragraph that StackManager is the agent that restacks branches. (advisory-findings)

@@ -1,0 +1,16 @@
+kk-review-packet: this packet has no narrative written into it yet. Every prose slot is still empty, so most of what follows is 'the writer has not run', not 'the writer got it wrong'.
+p-20261101-40885a  PER-172  INVALID — 12 violation(s)
+  [coverage] H-001: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-002: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [required-fields] files[].role: is missing on files[0] skills/engineering-manager/scripts/kk-packet.sh
+  [required-fields] narrative.context: is missing
+  [required-fields] narrative.overview: is missing
+  [required-fields] narrative.problem: is missing
+  [required-fields] narrative.scope.in: needs at least 1 entry, has 0
+  [required-fields] narrative.scope.out: needs at least 1 entry, has 0
+  [required-fields] narrative.sections: needs at least 1 entry, has 0
+  [required-fields] narrative.thesis: is missing
+  [required-fields] narrative.title: is missing
+  [required-fields] tests: needs at least 1 entry, has 0
+  warning: No risks are named. A change with none is rare enough to be worth saying. (no-risks)
+kk-review-packet: 12 violation(s) — nothing renders until they are fixed.

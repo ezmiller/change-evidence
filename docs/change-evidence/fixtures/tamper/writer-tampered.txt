@@ -1,0 +1,8 @@
+p-20261029-73e8ad  PER-148  INVALID — 6 violation(s)
+  [files-exact] agents/gatekeeper.md: is in the facts but the document does not name it
+  [files-exact] not/a/file.sh: is not a file in the facts
+  [hunks-exist] narrative.sections[0] import-pins-the-pr body[1]: cites "H-999", which is not a hunk in this packet
+  [coverage] H-001: is accounted for 2 times; a hunk belongs to exactly one place
+  [required-fields] files[].role: is missing on files[0] agents/gatekeeper.md
+  [limits] narrative.sections[1] brief-or-mark-stale body[1]: 11 chars, floor 60 — short by 49
+kk-review-packet: 6 violation(s) — nothing renders until they are fixed.

@@ -1,0 +1,454 @@
+{
+  "affectedTests": [
+    "skills/engineering-manager/tests/README.md",
+    "skills/engineering-manager/tests/run-tests.sh"
+  ],
+  "base": "f59f853d8087e2ecff590bb3a2e904ababc8f089",
+  "calleeDeltas": [],
+  "callerSetsAssessed": 2,
+  "callerSetsIncomplete": [
+    {
+      "change": "modified",
+      "entity": "settle_restack",
+      "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "incompleteBecause": [
+        {
+          "code": "value_refs",
+          "detail": "3 name used as a value (callback, registry, attribute access)"
+        }
+      ],
+      "line": 292,
+      "possibleCallersNotModified": [
+        {
+          "entity": "<module level>",
+          "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+          "line": 0,
+          "sites": [
+            {
+              "kind": "value_ref",
+              "line": 468,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 487,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 508,
+              "via": null
+            }
+          ],
+          "type": "module"
+        }
+      ],
+      "type": "function"
+    },
+    {
+      "change": "modified",
+      "entity": "pq_safe",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "incompleteBecause": [
+        {
+          "code": "value_refs",
+          "detail": "7 name used as a value (callback, registry, attribute access)"
+        }
+      ],
+      "line": 2708,
+      "possibleCallersNotModified": [
+        {
+          "entity": "<module level>",
+          "file": "skills/engineering-manager/tests/run-tests.sh",
+          "line": 0,
+          "sites": [
+            {
+              "kind": "value_ref",
+              "line": 2718,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2722,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2730,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2738,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2746,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2757,
+              "via": null
+            },
+            {
+              "kind": "value_ref",
+              "line": 2771,
+              "via": null
+            }
+          ],
+          "type": "module"
+        }
+      ],
+      "type": "function"
+    }
+  ],
+  "callerSetsNotAssessed": 0,
+  "cone": {
+    "dependentFiles": [],
+    "filesOutsideCone": 184,
+    "filesWithStaticDependents": 0,
+    "sourceFiles": 197
+  },
+  "entities": [
+    {
+      "change": "modified",
+      "file": "agents/gatekeeper.md",
+      "lines": [
+        320,
+        384
+      ],
+      "name": "Stacked work",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "agents/personal/gatekeeper.md",
+      "lines": [
+        339,
+        396
+      ],
+      "name": "Stacked work",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "agents/personal/stack-manager.md",
+      "lines": [
+        204,
+        251
+      ],
+      "name": "Use kk-restack",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "agents/personal/stack-manager.md",
+      "lines": [
+        252,
+        271
+      ],
+      "name": "A ticket Ethan reviews in packets",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "agents/stack-manager.md",
+      "lines": [
+        176,
+        220
+      ],
+      "name": "Use kk-restack",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "agents/stack-manager.md",
+      "lines": [
+        221,
+        240
+      ],
+      "name": "A ticket Ethan reviews in packets",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/SKILL.md",
+      "lines": [
+        46,
+        97
+      ],
+      "name": "Use the scripts",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/references/stacking.md",
+      "lines": [
+        69,
+        99
+      ],
+      "name": "Who does what",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/references/stacking.md",
+      "lines": [
+        172,
+        210
+      ],
+      "name": "Who does it, and how",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "lines": [
+        1,
+        65
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "lines": [
+        290,
+        291
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "lines": [
+        292,
+        312
+      ],
+      "name": "settle_restack",
+      "oldFile": null,
+      "oldName": null,
+      "type": "function"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "lines": [
+        448,
+        513
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-grant.sh",
+      "lines": [
+        1,
+        210
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-may.sh",
+      "lines": [
+        227,
+        427
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-packet.sh",
+      "lines": [
+        844,
+        865
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-restack.sh",
+      "lines": [
+        1,
+        164
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-restack.sh",
+      "lines": [
+        167,
+        318
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-restack.sh",
+      "lines": [
+        323,
+        532
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/README.md",
+      "lines": [
+        355,
+        425
+      ],
+      "name": "Adding a case",
+      "oldFile": null,
+      "oldName": null,
+      "type": "heading"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2341,
+        2515
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2594,
+        2624
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2626,
+        2654
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2670,
+        2707
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2708,
+        2712
+      ],
+      "name": "pq_safe",
+      "oldFile": null,
+      "oldName": null,
+      "type": "function"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/tests/run-tests.sh",
+      "lines": [
+        2713,
+        2821
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    }
+  ],
+  "head": "ab3a477b1fc24eefedca7bc781364886ab118754",
+  "laws": {
+    "results": [],
+    "sources": []
+  },
+  "limits": "static reference graph only: calls the resolver cannot pin (dynamic dispatch, reflection, string-keyed lookup, callbacks registered at runtime) and non-code consumers are not modeled",
+  "moduleReachability": {
+    "changedModules": [],
+    "edgesAdded": [],
+    "edgesRemoved": [],
+    "modules": 5,
+    "modulesWithGrownReach": 0,
+    "newlyReachedTargets": []
+  },
+  "noTestReaches": false,
+  "signatureChanges": [],
+  "summary": {
+    "added": 0,
+    "deleted": 0,
+    "entitiesChanged": 26,
+    "filesChanged": 13,
+    "modified": 26,
+    "moved": 0,
+    "renamed": 0
+  },
+  "untouchedCallers": []
+}

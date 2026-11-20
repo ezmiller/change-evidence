@@ -1,0 +1,55 @@
+{
+  "summary": {
+    "fileCount": 1,
+    "added": 0,
+    "modified": 2,
+    "deleted": 0,
+    "moved": 0,
+    "renamed": 0,
+    "reordered": 0,
+    "binary": 0,
+    "orphan": 2,
+    "total": 2
+  },
+  "changes": [
+    {
+      "entityId": "skills/engineering-manager/scripts/kk-packet.sh::orphan::modified@L283-341",
+      "changeType": "modified",
+      "entityType": "orphan",
+      "entityName": "module-level",
+      "startLine": 283,
+      "endLine": 341,
+      "oldStartLine": 283,
+      "oldEndLine": 340,
+      "oldEntityName": null,
+      "filePath": "skills/engineering-manager/scripts/kk-packet.sh",
+      "oldFilePath": null,
+      "oldParentId": null,
+      "beforeContent": "\n\n# import: the PR, read once, then its one review ticket \u2014 found by pr_url, or\n# created. Nothing on GitHub is written: `gh pr view` is the only gh call.\npr=\"\"\u2026[clipped by PER-174]",
+      "afterContent": "\n\n# import: the PR, read once, then its one review ticket \u2014 found by pr_url, or\n# created. Nothing on GitHub is written: `gh pr view` is the only gh call.\npr=\"\"\u2026[clipped by PER-174]",
+      "commitSha": null,
+      "author": null,
+      "structuralChange": true
+    },
+    {
+      "entityId": "skills/engineering-manager/scripts/kk-packet.sh::orphan::modified@L905-976",
+      "changeType": "modified",
+      "entityType": "orphan",
+      "entityName": "module-level",
+      "startLine": 905,
+      "endLine": 976,
+      "oldStartLine": 904,
+      "oldEndLine": 974,
+      "oldEntityName": null,
+      "filePath": "skills/engineering-manager/scripts/kk-packet.sh",
+      "oldFilePath": null,
+      "oldParentId": null,
+      "beforeContent": "\n\nproject_id=$(printf '%s' \"$issue\" | jq -r '.project_id // empty')\nproject_name=$project_id\nif [ -n \"$project_id\" ]; then\n  project_name=$(kk-project --name \"$\u2026[clipped by PER-174]",
+      "afterContent": "\n\nproject_id=$(printf '%s' \"$issue\" | jq -r '.project_id // empty')\nproject_name=$project_id\nif [ -n \"$project_id\" ]; then\n  project_name=$(kk-project --name \"$\u2026[clipped by PER-174]",
+      "commitSha": null,
+      "author": null,
+      "structuralChange": true
+    }
+  ],
+  "binaryChanges": []
+}

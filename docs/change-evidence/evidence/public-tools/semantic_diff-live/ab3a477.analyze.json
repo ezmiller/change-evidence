@@ -1,0 +1,254 @@
+{
+  "schema_version": 2,
+  "change_set": {
+    "kind": "commit",
+    "ref": "ab3a477b",
+    "head_sha": "ab3a477b1fc24eefedca7bc781364886ab118754",
+    "base_sha": "f59f853d8087e2ecff590bb3a2e904ababc8f089",
+    "title": "refactor(kk-restack): rename --prepare to --keep-local, restack_prepared to restack_unpushed (PER-144)",
+    "description": "\"Prepare\" did not say what it leaves behind. The flag keeps the verified\nrebase on the ticket's local branch; the record is a restack not yet pushed.\n\nCo-authored-by: multica-agent <[EMAIL_1]>",
+    "authors": [
+      "Ethan Miller <ethanzanemiller@gmail.com>"
+    ],
+    "date": "2026-10-28T19:53:13-04:00",
+    "commits": [
+      {
+        "short_hash": "ab3a477b",
+        "subject": "refactor(kk-restack): rename --prepare to --keep-local, restack_prepared to restack_unpushed (PER-144)",
+        "author": "Ethan Miller <ethanzanemiller@gmail.com>"
+      }
+    ]
+  },
+  "files_changed": [
+    {
+      "path": "agents/gatekeeper.md",
+      "change_type": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "diff_content": "@@ -335,7 +335,7 @@ Get this wrong and the PR's diff includes the parent's work as well as the child\n which is the exact confusion stacking exists to avoid. If `parent_branch` is empty,\n the base is `main`.\n \n-On a prepared restack (`restack_prepared`, PER-144), `kk-dispatch check --step pr`\n+On an unpushed restack (`restack_unpushed`, PER-144), `kk-dispatch check --step pr`\n clears a merged parent's `parent_branch` once origin holds the head, so read it\n after that check, never before.\n \n",
+      "language": "markdown"
+    },
+    {
+      "path": "agents/personal/gatekeeper.md",
+      "change_type": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "diff_content": "@@ -354,7 +354,7 @@ Get this wrong and the PR's diff includes the parent's work as well as the child\n which is the exact confusion stacking exists to avoid. If `parent_branch` is empty,\n the base is `main`.\n \n-On a prepared restack (`restack_prepared`, PER-144), `kk-dispatch check --step pr`\n+On an unpushed restack (`restack_unpushed`, PER-144), `kk-dispatch check --step pr`\n clears a merged parent's `parent_branch` once origin holds the head, so read it\n after that check, never before.\n \n",
+      "language": "markdown"
+    },
+    {
+      "path": "agents/personal/stack-manager.md",
+      "change_type": "modified",
+      "additions": 5,
+      "deletions": 5,
+      "diff_content": "@@ -206,7 +206,7 @@ force-push. That can destroy commits.\n ```\n kk-restack <ticket> --workspace personal --verify \"<check>\"            # rebase, verify, force-push\n kk-restack <ticket> --workspace personal --verify \"<check>\" --dry-run  # same, but pushes nothing and leaves nothing behind\n-kk-restack <ticket> --workspace personal --verify \"<check>\" --prepare  # packet-reviewed: keep it on the local branch\n+kk-restack <ticket> --workspace personal --verify \"<check>\" --keep-local  # packet-reviewed: keep it on the local branch\n ```\n \n **Always pass `--verify`.** Its default is `kk-verify`, which is the build gate for\n@@ -252,16 +252,16 @@ guessing \u2014 a wrong value silently duplicates the parent's changes into this di\n ### A ticket Ethan reviews in packets\n \n `kk-restack` refuses a ticket with `packet_review_required`, because it would push\n-code he has not approved. Prepare it instead, **from the ticket's own checkout** \u2014\n-the worktree that has its branch checked out:\n+code he has not approved. Keep the rebase local instead, **from the ticket's own\n+checkout** \u2014 the worktree that has its branch checked out:\n \n ```\n-kk-restack <ticket> --workspace personal --verify \"<check>\" --prepare\n+kk-restack <ticket> --workspace personal --verify \"<check>\" --keep-local\n ```\n \n Same checks, same exits, nothing pushed. On success the ticket's local branch holds\n the verified rebased head, `origin/<branch>` still holds the old one, and\n-`restack_prepared` records both. Then `kk-packet ensure <ticket>` builds a\n+`restack_unpushed` records both. Then `kk-packet ensure <ticket>` builds a\n review-chain-break packet whose lease is the old remote head. Ethan approves it,\n force-push included, on the packet page; Gatekeeper pushes that exact head with\n `--force-with-lease`, and `kk-dispatch` updates `parent_tip_sha` and clears\n",
+      "language": "markdown"
+    },
+    {
+      "path": "agents/stack-manager.md",
+      "change_type": "modified",
+      "additions": 5,
+      "deletions": 5,
+      "diff_content": "@@ -178,7 +178,7 @@ force-push. That can destroy commits.\n ```\n kk-restack <ticket> --project <name>            # rebase onto the parent, then force-push\n kk-restack <ticket> --dry-run    # rebase, verify, report; pushes nothing and leaves nothing behind\n-kk-restack <ticket> --prepare    # a packet-reviewed ticket: rebase, verify, keep it on the local branch\n+kk-restack <ticket> --keep-local # a packet-reviewed ticket: rebase, verify, keep it on the local branch\n ```\n \n **Local state cannot block you any more.** kk-restack works on a detached HEAD\n@@ -221,16 +221,16 @@ guessing \u2014 a wrong value silently duplicates the parent's changes into this di\n ### A ticket Ethan reviews in packets\n \n `kk-restack` refuses a ticket with `packet_review_required`, because it would push\n-code he has not approved. Prepare it instead, **from the ticket's own checkout** \u2014\n-the worktree that has its branch checked out:\n+code he has not approved. Keep the rebase local instead, **from the ticket's own\n+checkout** \u2014 the worktree that has its branch checked out:\n \n ```\n-kk-restack <ticket> --verify \"<check>\" --prepare\n+kk-restack <ticket> --verify \"<check>\" --keep-local\n ```\n \n Same checks, same exits, nothing pushed. On success the ticket's local branch holds\n the verified rebased head, `origin/<branch>` still holds the old one, and\n-`restack_prepared` records both. Then `kk-packet ensure <ticket>` builds a\n+`restack_unpushed` records both. Then `kk-packet ensure <ticket>` builds a\n review-chain-break packet whose lease is the old remote head. Ethan approves it,\n force-push included, on the packet page; Gatekeeper pushes that exact head with\n `--force-with-lease`, and `kk-dispatch` updates `parent_tip_sha` and clears\n",
+      "language": "markdown"
+    },
+    {
+      "path": "skills/engineering-manager/SKILL.md",
+      "change_type": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "diff_content": "@@ -86,7 +86,7 @@ you already know.\n | `kk-stack tree --project <name>` | Draw the stack. Needs no repo access |\n | `kk-stack check --project <name>` | Find broken stack metadata. Exit 1 means it found some |\n | `kk-sync --project <name>` | **Reconcile the board against Jira.** Exit 2 means act |\n-| `kk-restack <ticket>` | Rebase a stacked branch onto its parent (StackManager). `--prepare` keeps a reviewed ticket's rebase local, for a chain-break packet |\n+| `kk-restack <ticket>` | Rebase a stacked branch onto its parent (StackManager). `--keep-local` keeps a reviewed ticket's rebase local, for a chain-break packet |\n \n Exit codes carry meaning: `3` no such ticket, `4` blocked by a dependency,\n `5` refused as a duplicate, `6` not permitted yet. `kk-handoff`, `kk-verify` and\n",
+      "language": "markdown"
+    },
+    {
+      "path": "skills/engineering-manager/references/stacking.md",
+      "change_type": "modified",
+      "additions": 9,
+      "deletions": 9,
+      "diff_content": "@@ -77,9 +77,9 @@ Gatekeeper holds a GitHub API token, so only it can open a PR, change a base, or\n read a merged PR's fork point.\n \n ```\n-kk-restack <ticket>              rebase onto the parent, then force-push\n-kk-restack <ticket> --dry-run    rebase locally, push nothing\n-kk-restack <ticket> --prepare    rebase locally for a chain-break packet, push nothing\n+kk-restack <ticket>               rebase onto the parent, then force-push\n+kk-restack <ticket> --dry-run     rebase locally, push nothing\n+kk-restack <ticket> --keep-local  rebase locally for a chain-break packet, push nothing\n ```\n \n Force-push needs its own grant \u2014 `kk-may <id> force-push`. A `push` grant does not\n@@ -175,15 +175,15 @@ created.\n system \u2014 see `agents/stack-manager.md` in botserver-nix. It uses:\n \n ```\n-kk-restack <ticket>             rebase onto the parent, then force-push\n-kk-restack <ticket> --dry-run   rebase and verify, push nothing, leave nothing behind\n-kk-restack <ticket> --prepare   rebase and verify, push nothing, keep the result\n-                                on the ticket's local branch (packet-reviewed)\n+kk-restack <ticket>                rebase onto the parent, then force-push\n+kk-restack <ticket> --dry-run      rebase and verify, push nothing, leave nothing behind\n+kk-restack <ticket> --keep-local   rebase and verify, push nothing, keep the result\n+                                   on the ticket's local branch (packet-reviewed)\n ```\n \n A ticket with `packet_review_required` is refused by the first form and goes\n-through `--prepare` (PER-144), run in the ticket's own checkout. The rebased head\n-stays local with `origin/<branch>` untouched, recorded as `restack_prepared`;\n+through `--keep-local` (PER-144), run in the ticket's own checkout. The rebased head\n+stays local with `origin/<branch>` untouched, recorded as `restack_unpushed`;\n `kk-packet ensure` then builds a review-chain-break packet against the default\n branch whose lease is the old remote head, and Ethan's approval of it is the\n force-push. `kk-dispatch` settles `parent_tip_sha` and `parent_branch` once\n",
+      "language": "markdown"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-dispatch.sh",
+      "change_type": "modified",
+      "additions": 9,
+      "deletions": 9,
+      "diff_content": "@@ -53,7 +53,7 @@\n # every step; before a force-push it also requires the remote at the lease.\n # Nothing here grants anything.\n #\n-# A force-push of the head `kk-restack --prepare` recorded, at its lease, settles\n+# A force-push of the head `kk-restack --keep-local` recorded, at its lease, settles\n # the stack metadata once origin holds it (PER-144): parent_tip_sha moves to the\n # new base, parent_branch is cleared if the parent merged, and the record goes.\n #\n@@ -287,26 +287,26 @@ deliver() {   # job-json\n   jev \"$1\" delivered \"$(jq -nc --arg c \"$cid\" '{comment: (if $c == \"\" then null else $c end)}')\"\n }\n \n-# The prepared restack this job published, once origin is at its head. Run when\n+# The unpushed restack this job published, once origin is at its head. Run when\n # check finds the head already there, before pr, and at a completed finish.\n settle_restack() {   # job-json\n   local p\n-  p=$(printf '%s' \"$meta\" | jq -c '.restack_prepared // empty | fromjson? // empty' 2>/dev/null || true)\n+  p=$(printf '%s' \"$meta\" | jq -c '.restack_unpushed // empty | fromjson? // empty' 2>/dev/null || true)\n   [ -n \"$p\" ] || return 0\n   jq -e --argjson j \"$1\" '($j.steps | index(\"force-push\")) and .head == $j.head and .lease == $j.lease' \\\n     <<< \"$p\" >/dev/null || return 0\n   if ! multica issue metadata set \"$ticket\" --key parent_tip_sha --value \"$(jq -r .onto <<< \"$p\")\" >/dev/null 2>&1 </dev/null; then\n-    echo \"kk-dispatch: warning: could not update parent_tip_sha on $ident; restack_prepared is kept, so this is retried\" >&2\n+    echo \"kk-dispatch: warning: could not update parent_tip_sha on $ident; restack_unpushed is kept, so this is retried\" >&2\n     return 0\n   fi\n   if [ \"$(jq -r .parent_merged <<< \"$p\")\" = true ] \\\n      && ! multica issue metadata delete \"$ticket\" --key parent_branch >/dev/null 2>&1 </dev/null; then\n-    echo \"kk-dispatch: warning: could not clear parent_branch on $ident; restack_prepared is kept, so this is retried\" >&2\n+    echo \"kk-dispatch: warning: could not clear parent_branch on $ident; restack_unpushed is kept, so this is retried\" >&2\n     return 0\n   fi\n-  multica issue metadata delete \"$ticket\" --key restack_prepared >/dev/null 2>&1 </dev/null \\\n-    || echo \"kk-dispatch: warning: could not delete restack_prepared on $ident\" >&2\n-  meta=$(printf '%s' \"$meta\" | jq -c --argjson p \"$p\" '.parent_tip_sha = $p.onto | del(.restack_prepared)\n+  multica issue metadata delete \"$ticket\" --key restack_unpushed >/dev/null 2>&1 </dev/null \\\n+    || echo \"kk-dispatch: warning: could not delete restack_unpushed on $ident\" >&2\n+  meta=$(printf '%s' \"$meta\" | jq -c --argjson p \"$p\" '.parent_tip_sha = $p.onto | del(.restack_unpushed)\n                                                      | if $p.parent_merged then del(.parent_branch) else . end')\n   echo \"stack metadata: parent_tip_sha -> $(jq -r '.onto[0:12]' <<< \"$p\")$(jq -r 'if .parent_merged then \"; parent_branch cleared, no longer stacked\" else \"\" end' <<< \"$p\")\"\n }\n@@ -463,7 +463,7 @@ check)\n   [ \"$now_head\" = \"$head\" ] \\\n     || refuse \"  - $branch in $repo is at ${now_head:-nothing readable}; Ethan approved ${head:0:12}\"\n   # Before the PR reads parent_branch for its base: settled only once origin holds the head.\n-  if [ \"$step\" = pr ] && printf '%s' \"$meta\" | jq -e 'has(\"restack_prepared\")' >/dev/null \\\n+  if [ \"$step\" = pr ] && printf '%s' \"$meta\" | jq -e 'has(\"restack_unpushed\")' >/dev/null \\\n      && [ \"$(GIT_TERMINAL_PROMPT=0 git -C \"$repo\" -c core.fsmonitor=false ls-remote --heads -- origin \"refs/heads/$branch\" 2>/dev/null | cut -f1)\" = \"$head\" ]; then\n     settle_restack \"$j\"\n   fi\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-grant.sh",
+      "change_type": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "diff_content": "@@ -137,7 +137,7 @@ if [ -n \"$sha\" ] && case \" $* \" in *\" force-push \"*) true ;; *) false ;; esac; t\n   echo \"kk-grant: error: force-push is not granted by --sha: it needs the remote head it may replace, its lease.\" >&2\n   echo \"kk-grant: approve the chain-break packet for that revision instead, on its page or with\" >&2\n   echo \"kk-grant:   kk-grant $id force-push --packet <packet id> --lease <the remote head it recorded>\" >&2\n-  echo \"kk-grant: a restack of a reviewed ticket gets one from kk-restack <ticket> --prepare, then kk-packet ensure. Nothing recorded.\" >&2\n+  echo \"kk-grant: a restack of a reviewed ticket gets one from kk-restack <ticket> --keep-local, then kk-packet ensure. Nothing recorded.\" >&2\n   exit 1\n fi\n \n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-may.sh",
+      "change_type": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "diff_content": "@@ -243,7 +243,7 @@ if is_code && { reviewed || { [ \"$bare\" = no ] && [ -n \"$revs\" ]; }; }; then\n     [ -z \"$others\" ] || printf '%s\\n' \"$revs\" | grep -qx \"$head\" || mismatch=\"Checkout/head mismatch: $canon has $branch at $head, and no $action grant\n names it. Exact-SHA grants are honoured at the revision they name; this checkout\n is not there. If Ethan approved another revision, bring this checkout's branch to\n-it (a reviewed restack: kk-restack $ident --prepare, from this checkout).\"\n+it (a reviewed restack: kk-restack $ident --keep-local, from this checkout).\"\n     f=$(fold) || { record_broken \"$KK_PH_KEY on $ident is damaged: not a history array, or its checksum fails.\"; exit 6; }\n \n     req=$(jq -c \"$KK_AP_JQ\"' . as $f | kk_ap_required($f)' <<< \"$f\")\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "change_type": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "diff_content": "@@ -856,9 +856,9 @@ ERR\n   if [ -n \"$base_ref\" ]; then\n     rargs+=(--base \"$base_ref\")\n   elif [ -n \"$parent_branch\" ] \\\n-       && ! printf '%s' \"$(meta restack_prepared)\" | jq -e '.parent_merged == true' >/dev/null 2>&1; then\n+       && ! printf '%s' \"$(meta restack_unpushed)\" | jq -e '.parent_merged == true' >/dev/null 2>&1; then\n     # PER-66: a stacked ticket's base is its parent branch, not an explicit one.\n-    # Not once a prepared restack has replayed it off a merged parent (PER-144):\n+    # Not once an unpushed restack has replayed it off a merged parent (PER-144):\n     # parent_branch stays until the push lands, but the base is the default branch.\n     rargs+=(--parent-branch \"$parent_branch\")\n   fi\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-restack.sh",
+      "change_type": "modified",
+      "additions": 30,
+      "deletions": 30,
+      "diff_content": "@@ -2,19 +2,19 @@\n #\n # Body for pkgs.writeShellApplication (no shebang / set -euo here).\n #\n-#   kk-restack <ticket> [--dry-run | --prepare] [--allow-dropped]\n+#   kk-restack <ticket> [--dry-run | --keep-local] [--allow-dropped]\n #\n-# Must run inside a checkout of the repository; with --prepare, the ticket's own.\n+# Must run inside a checkout of the repository; with --keep-local, the ticket's own.\n #\n-# --prepare (PER-144) is for a ticket Ethan reviews in packets: rebase and verify\n+# --keep-local (PER-144) is for a ticket Ethan reviews in packets: rebase and verify\n # as below, push nothing, and leave the verified head on the ticket's local branch\n # with origin/<branch> where it was. kk-packet then builds a review-chain-break\n # packet whose lease is that old remote head, and only Ethan's approval of it\n # publishes, by force-with-lease. kk-dispatch updates the stack metadata once\n-# that push lands, from the `restack_prepared` record written here.\n+# that push lands, from the `restack_unpushed` record written here.\n #\n # Exit codes:\n-#   0  rebased (and pushed unless --dry-run or --prepare)\n+#   0  rebased (and pushed unless --dry-run or --keep-local)\n #   1  bad input, missing/invalid metadata, or a tool failed\n #   3  rebase conflict \u2014 aborted, nothing pushed, branch unchanged\n #   4  commits disappeared during the rebase \u2014 nothing pushed\n@@ -56,7 +56,7 @@ remote=${KK_REMOTE:-origin}\n \n ticket=\"\"\n dry_run=0\n-prepare=0\n+keep_local=0\n allow_dropped=0\n skip_verify=0\n \n@@ -80,7 +80,7 @@ verify_cmd=${KK_VERIFY_CMD:-kk-verify}\n while [ $# -gt 0 ]; do\n   case \"$1\" in\n     --dry-run) dry_run=1; shift ;;\n-    --prepare) prepare=1; shift ;;\n+    --keep-local) keep_local=1; shift ;;\n     --project) project_arg=${2:-}; shift 2 ;;\n     --project=*) project_arg=${1#--project=}; shift ;;\n     --workspace) workspace_arg=${2:-}; shift 2 ;;\n@@ -90,11 +90,11 @@ while [ $# -gt 0 ]; do\n     --verify) verify_cmd=${2:-}; shift 2 ;;\n     -h|--help)\n       cat <<'USAGE'\n-usage: kk-restack <ticket> [--dry-run | --prepare] [--allow-dropped] [--no-verify] [--verify CMD]\n+usage: kk-restack <ticket> [--dry-run | --keep-local] [--allow-dropped] [--no-verify] [--verify CMD]\n                            [--project <name>] [--workspace <name>]\n \n   --dry-run         rebase locally, verify, push nothing, leave nothing behind\n-  --prepare         rebase, verify, push nothing; leave the result on the ticket's\n+  --keep-local      rebase, verify, push nothing; leave the result on the ticket's\n                     local branch in this checkout, for a chain-break packet\n   --allow-dropped   push even if commits disappeared during the rebase\n   --no-verify       skip the build typecheck before pushing (say why, in the report)\n@@ -112,8 +112,8 @@ USAGE\n       ticket=$1; shift ;;\n   esac\n done\n-if [ \"$dry_run\" -eq 1 ] && [ \"$prepare\" -eq 1 ]; then\n-  echo \"kk-restack: --dry-run leaves nothing behind and --prepare leaves the branch; pick one\" >&2\n+if [ \"$dry_run\" -eq 1 ] && [ \"$keep_local\" -eq 1 ]; then\n+  echo \"kk-restack: --dry-run leaves nothing behind and --keep-local leaves the branch; pick one\" >&2\n   exit 1\n fi\n \n@@ -127,7 +127,7 @@ echo \"workspace: $(kk_ws_label)\" >&2\n echo \"project: $project_name\" >&2\n \n if [ -z \"$ticket\" ]; then\n-  echo 'usage: kk-restack <ticket> [--dry-run | --prepare] [--allow-dropped] [--no-verify] [--verify CMD]' >&2\n+  echo 'usage: kk-restack <ticket> [--dry-run | --keep-local] [--allow-dropped] [--no-verify] [--verify CMD]' >&2\n   exit 1\n fi\n \n@@ -198,14 +198,14 @@ fi\n # On a ticket Ethan asked to review, the push has to be the exact commit whose\n # code he approved (PER-42). A rebase makes new commits he has not seen, so this\n # script \u2014 which rebases and pushes in one go \u2014 stops before touching anything.\n-# --prepare pushes nothing, so it needs neither this nor a force-push grant.\n-if [ \"$prepare\" -eq 0 ] && printf '%s' \"$meta\" | jq -e 'has(\"packet_review_required\")' >/dev/null 2>&1; then\n+# --keep-local pushes nothing, so it needs neither this nor a force-push grant.\n+if [ \"$keep_local\" -eq 0 ] && printf '%s' \"$meta\" | jq -e 'has(\"packet_review_required\")' >/dev/null 2>&1; then\n   cat >&2 <<MSG\n kk-restack: REFUSING: Ethan reviews $ident's code before it leaves the machine.\n A rebase produces commits whose code he has not approved, and this script would\n-push them. Prepare it instead, from the ticket's own checkout:\n+push them. Keep the rebase local instead, from the ticket's own checkout:\n \n-  kk-restack $ident --prepare\n+  kk-restack $ident --keep-local\n \n then have its chain-break packet built and approved, and let Gatekeeper push\n that exact commit. Nothing was touched.\n@@ -213,7 +213,7 @@ MSG\n   exit 6\n fi\n \n-if [ \"$prepare\" -eq 1 ]; then\n+if [ \"$keep_local\" -eq 1 ]; then\n   :\n elif kk_may_out=$(kk-may \"$id\" force-push 2>&1); then\n   :\n@@ -326,30 +326,30 @@ trap restore_checkout EXIT\n # by anything that moves the remote-tracking ref in between.\n lease_sha=$(git rev-parse \"$remote/$branch\")\n \n-# --prepare leaves its result on refs/heads/<branch>, so the one exception to the\n+# --keep-local leaves its result on refs/heads/<branch>, so the one exception to the\n # rule above is checked before anything moves: the branch must be checked out\n # here or nowhere, and hold nothing origin does not.\n-if [ \"$prepare\" -eq 1 ]; then\n+if [ \"$keep_local\" -eq 1 ]; then\n   here=$(realpath -e -- \"$(git rev-parse --show-toplevel)\")\n   held=$(git worktree list --porcelain | awk -v b=\"branch refs/heads/$branch\" \\\n            '/^worktree /{w=substr($0, 10)} $0 == b {print w}' | head -1)\n   [ -z \"$held\" ] || held=$(realpath -e -- \"$held\" 2>/dev/null || printf '%s' \"$held\")\n   if [ -n \"$held\" ] && [ \"$held\" != \"$here\" ]; then\n     echo \"kk-restack: REFUSING: '$branch' is checked out in $held, the ticket's checkout.\" >&2\n-    echo \"kk-restack: run kk-restack $ident --prepare from there. Nothing was touched.\" >&2\n+    echo \"kk-restack: run kk-restack $ident --keep-local from there. Nothing was touched.\" >&2\n     exit 5\n   fi\n   local_sha=$(git rev-parse --verify --quiet \"refs/heads/$branch\" || true)\n   if [ -n \"$local_sha\" ] && [ \"$local_sha\" != \"$lease_sha\" ]; then\n-    prepared=$(mval restack_prepared)\n-    if [ -n \"$prepared\" ] && printf '%s' \"$prepared\" | jq -e --arg h \"$local_sha\" --arg l \"$lease_sha\" \\\n+    unpushed=$(mval restack_unpushed)\n+    if [ -n \"$unpushed\" ] && printf '%s' \"$unpushed\" | jq -e --arg h \"$local_sha\" --arg l \"$lease_sha\" \\\n          '.head == $h and .lease == $l' >/dev/null 2>&1; then\n-      echo \"already prepared: '$branch' is at $local_sha here; $remote/$branch is still at $lease_sha.\"\n+      echo \"already kept locally: '$branch' is at $local_sha here; $remote/$branch is still at $lease_sha.\"\n       echo \"next: kk-packet ensure $ident\"\n       exit 0\n     fi\n     echo \"kk-restack: REFUSING: local '$branch' is at $local_sha, not $remote/$branch ($lease_sha).\" >&2\n-    echo \"kk-restack: it holds commits origin does not, and preparing would replace them. Nothing was touched.\" >&2\n+    echo \"kk-restack: it holds commits origin does not, and keeping a restack here would replace them. Nothing was touched.\" >&2\n     exit 5\n   fi\n fi\n@@ -446,29 +446,29 @@ if [ \"$dry_run\" -eq 1 ]; then\n   exit 0\n fi\n \n-if [ \"$prepare\" -eq 1 ]; then\n+if [ \"$keep_local\" -eq 1 ]; then\n   new_head=$(git rev-parse HEAD)\n   record=$(jq -nc --arg h \"$new_head\" --arg l \"$lease_sha\" --arg o \"$(git rev-parse \"$target\")\" \\\n              --arg r \"$target\" --argjson m \"$parent_merged\" \\\n              '{head: $h, lease: $l, onto: $o, onto_ref: $r, parent_merged: ($m == 1)}')\n   # Recorded before the branch moves: a record nothing matches is inert, a moved\n   # branch with no record would leave the stack metadata stale after the push.\n-  if ! multica issue metadata set \"$id\" --key restack_prepared --value \"$record\" >/dev/null 2>&1 </dev/null; then\n-    echo \"kk-restack: error: could not record restack_prepared on $ident. Nothing was touched.\" >&2\n+  if ! multica issue metadata set \"$id\" --key restack_unpushed --value \"$record\" >/dev/null 2>&1 </dev/null; then\n+    echo \"kk-restack: error: could not record restack_unpushed on $ident. Nothing was touched.\" >&2\n     exit 1\n   fi\n-  if ! git update-ref -m \"kk-restack --prepare\" \"refs/heads/$branch\" \"$new_head\" \"$local_sha\" \\\n+  if ! git update-ref -m \"kk-restack --keep-local\" \"refs/heads/$branch\" \"$new_head\" \"$local_sha\" \\\n      || ! git checkout --quiet \"$branch\"; then\n     echo \"kk-restack: error: could not move '$branch' to $new_head here.\" >&2\n     exit 1\n   fi\n   orig_ref=$branch\n-  echo \"prepared $ident: '$branch' is at $new_head in $here \u2014 nothing pushed\"\n+  echo \"kept $ident's restack locally: '$branch' is at $new_head in $here \u2014 nothing pushed\"\n   echo \"  $remote/$branch stays at $lease_sha, the lease a force-push must name\"\n   echo \"next: kk-packet ensure $ident   (a review-chain-break packet; Ethan approves it, and may approve\"\n   echo \"      a force-push replacing exactly $lease_sha)\"\n   multica issue comment add \"$id\" \\\n-    --content \"Prepared a restack of \\`$branch\\` onto \\`$target\\` locally: \\`$(printf '%s' \"$new_head\" | cut -c1-12)\\`, $after commit(s). Not pushed; \\`$remote/$branch\\` stays at \\`$(printf '%s' \"$lease_sha\" | cut -c1-12)\\`.\" \\\n+    --content \"Restacked \\`$branch\\` onto \\`$target\\` and kept it local: \\`$(printf '%s' \"$new_head\" | cut -c1-12)\\`, $after commit(s). Not pushed; \\`$remote/$branch\\` stays at \\`$(printf '%s' \"$lease_sha\" | cut -c1-12)\\`.\" \\\n     >/dev/null 2>&1 </dev/null || true\n   exit 0\n fi\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/tests/README.md",
+      "change_type": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "diff_content": "@@ -405,12 +405,12 @@ never rides on a push.\n \n **A reviewed restack becomes a chain-break packet** (PER-144) replays\n PRI-173: a stacked branch approved at A, its parent squash-merged and deleted.\n-`kk-restack --prepare` leaves B on the branch in the ticket's checkout, origin\n+`kk-restack --keep-local` leaves B on the branch in the ticket's checkout, origin\n untouched; the follow-up packet is `not-descendant` with lease A, and\n `kk-packet ensure` builds it against the default branch, not the stale parent\n ref. Approving it queues one force-push job; Gatekeeper refuses a moved lease\n and a checkout not at B, and `finish` settles `parent_tip_sha`, clears\n-`parent_branch` and drops `restack_prepared`. Dirty trees, failed builds,\n+`parent_branch` and drops `restack_unpushed`. Dirty trees, failed builds,\n conflicts, dropped commits, another worktree holding the branch and unpushed\n local commits each leave both sides where they were; `--dry-run` is unchanged.\n `kk-grant --sha \u2026 force-push` is refused, and `kk-may` names a checkout/head\n",
+      "language": "markdown"
+    },
+    {
+      "path": "skills/engineering-manager/tests/run-tests.sh",
+      "change_type": "modified",
+      "additions": 23,
+      "deletions": 23,
+      "diff_content": "@@ -2503,7 +2503,7 @@ board=$cr_saved_board\n # The PER-127 spike board: one ticket per case where kk-can-assign, kk-graph and\n # kk-stack used to disagree. All three must now give the same state for each.\n \n-section \"kk-restack --prepare: a reviewed restack becomes a chain-break packet (PER-144)\"\n+section \"kk-restack --keep-local: a reviewed restack becomes a chain-break packet (PER-144)\"\n \n # PRI-173: a stacked branch with an approved packet at A; its parent is\n # squash-merged and deleted. The rebased head B has to reach Ethan as a\n@@ -2595,12 +2595,12 @@ pq_keep_root=${KK_REVIEW_PACKET_ROOT:-}\n pq_keep_now=${KK_APPROVAL_NOW:-}\n export KK_REVIEW_PACKET_ROOT=\"$pq/packets\" KK_APPROVAL_NOW=2026-10-27T18:00:00Z\n \n-# --- 1. prepare\n-run pq_restack --prepare --verify true\n+# --- 1. keep local\n+run pq_restack --keep-local --verify true\n st=$?\n pq_B=$(pq_local)\n-pq_rec=$(pq_meta restack_prepared)\n-check \"prepare: B replays only the child's commit onto the squash, on the ticket's branch in its checkout\" \\\n+pq_rec=$(pq_meta restack_unpushed)\n+check \"--keep-local: B replays only the child's commit onto the squash, on the ticket's branch in its checkout\" \\\n   \"$( [ \"$st\" -eq 0 ] && [ \"$pq_B\" != \"$pq_A\" ] && [ \"$(pq_git \"$PQ_R\" rev-parse \"$pq_B^\")\" = \"$pq_S\" ] \\\n       && [ \"$(pq_git \"$PQ_R\" diff --name-only \"$pq_S\" \"$pq_B\")\" = c.txt ] \\\n       && [ \"$(pq_on)\" = \"refs/heads/$PQ_B\" ] && [ -z \"$(pq_git \"$PQ_R\" status --porcelain)\" ] \\\n@@ -2609,13 +2609,13 @@ check \"  nothing pushed: origin's refs are byte-identical, and origin/$PQ_B in t\n   \"$( [ \"$(pq_origin)\" = \"$pq_origin0\" ] && [ \"$(pq_git \"$PQ_R\" rev-parse \"refs/remotes/origin/$PQ_B\")\" = \"$pq_A\" ] \\\n       && contains \"$out\" \"nothing pushed\" && contains \"$out\" \"origin/$PQ_B stays at $pq_A\" \\\n       && contains \"$out\" \"is at $pq_B\" && echo yes || echo no )\" \"$out\"\n-check \"  restack_prepared records B, the lease A and the new base; parent metadata waits for the push\" \\\n+check \"  restack_unpushed records B, the lease A and the new base; parent metadata waits for the push\" \\\n   \"$( [ \"$(jq -c '[.head, .lease, .onto, .parent_merged]' <<< \"$pq_rec\")\" = \"[\\\"$pq_B\\\",\\\"$pq_A\\\",\\\"$pq_S\\\",true]\" ] \\\n       && [ \"$(pq_meta parent_branch)\" = \"$PQ_P\" ] && [ \"$(pq_meta parent_tip_sha)\" = \"$pq_tip\" ] \\\n       && echo yes || echo no )\" \"$pq_rec\"\n-go pq_restack --prepare --verify true\n-check \"  run again: already prepared, B unchanged\" \\\n-  \"$( [ \"$st\" -eq 0 ] && contains \"$out\" \"already prepared\" && [ \"$(pq_local)\" = \"$pq_B\" ] \\\n+go pq_restack --keep-local --verify true\n+check \"  run again: already kept locally, B unchanged\" \\\n+  \"$( [ \"$st\" -eq 0 ] && contains \"$out\" \"already kept locally\" && [ \"$(pq_local)\" = \"$pq_B\" ] \\\n       && [ \"$(pq_origin)\" = \"$pq_origin0\" ] && echo yes || echo no )\" \"exit $st: $out\"\n \n # --- 2. the follow-up packet is a chain break with lease A\n@@ -2647,7 +2647,7 @@ printf '#!/usr/bin/env bash\\nprintf \"%%s\\\\n\" \"$*\" >> %q\\nexit 6\\n' \"$pq_sudo_log\n chmod +x \"$pq/stub-build\"\n go env FAKE_SUDO_HELPER=\"$pq/stub-build\" FAKE_SUDO_LOG=\"$pq/sudo-calls.log\" \\\n   kk-packet ensure PRI-173 --workspace primarykids --session-key 'agent:main:telegram:direct:1'\n-check \"  kk-packet builds a prepared restack off a merged parent against the default branch, not the parent\" \\\n+check \"  kk-packet builds an unpushed restack off a merged parent against the default branch, not the parent\" \\\n   \"$( grep -q -- \"--ticket PRI-173\" \"$pq_sudo_log\" && ! grep -q -- \"--parent-branch\" \"$pq_sudo_log\" \\\n       && echo yes || echo no )\" \"exit $st: $(cat \"$pq_sudo_log\") / $out\"\n \n@@ -2701,23 +2701,23 @@ check \"  CLEAR at lease A; the push lands B; finish settles the stack: parent_ti\n       && [ \"$p3\" -eq 0 ] && [ \"$(pq_git \"$PQ_O\" rev-parse \"refs/heads/$PQ_B\")\" = \"$pq_B\" ] && [ \"$st\" -eq 0 ] \\\n       && contains \"$out\" \"parent_branch cleared\" && [ \"$(pks .state)\" = completed ] \\\n       && [ \"$(pq_meta parent_tip_sha)\" = \"$pq_S\" ] && [ \"$(pq_meta parent_branch)\" = \"<none>\" ] \\\n-      && [ \"$(pq_meta restack_prepared)\" = \"<none>\" ] && echo yes || echo no )\" \\\n+      && [ \"$(pq_meta restack_unpushed)\" = \"<none>\" ] && echo yes || echo no )\" \\\n   \"$c3/$p3/$st: $o3 / $out / $(pq_meta parent_tip_sha) $(pq_meta parent_branch)\"\n \n # --- 4. every failure leaves local and remote where they were\n pq_safe() {   # \u2192 yes when nothing moved and nothing was recorded\n   [ \"$(pq_local)\" = \"$pq_A\" ] && [ \"$(pq_on)\" = \"refs/heads/$PQ_B\" ] \\\n-    && [ \"$(pq_git \"$PQ_O\" rev-parse \"refs/heads/$PQ_B\")\" = \"$pq_A\" ] && [ \"$(pq_meta restack_prepared)\" = \"<none>\" ] \\\n+    && [ \"$(pq_git \"$PQ_O\" rev-parse \"refs/heads/$PQ_B\")\" = \"$pq_A\" ] && [ \"$(pq_meta restack_unpushed)\" = \"<none>\" ] \\\n     && [ \"$(pq_meta parent_branch)\" = \"$PQ_P\" ] && echo yes || echo no\n }\n pq_reset\n echo dirty > \"$PQ_R/c.txt\"\n-run pq_restack --prepare --verify true; st=$?\n+run pq_restack --keep-local --verify true; st=$?\n pq_git \"$PQ_R\" checkout -q -- c.txt\n check \"a dirty worktree: refused (exit 1), nothing moved\" \\\n   \"$( [ \"$st\" -eq 1 ] && contains \"$err\" \"working tree is dirty\" && [ \"$(pq_safe)\" = yes ] && echo yes || echo no )\" \"exit $st: $err\"\n pq_reset\n-run pq_restack --prepare --verify false; st=$?\n+run pq_restack --keep-local --verify false; st=$?\n check \"a rebase that does not build: exit 9, the branch and HEAD back at A, nothing recorded\" \\\n   \"$( [ \"$st\" -eq 9 ] && contains \"$out\" \"VERIFY FAILED\" && [ \"$(pq_safe)\" = yes ] \\\n       && [ -z \"$(pq_git \"$PQ_R\" status --porcelain)\" ] && echo yes || echo no )\" \"exit $st: $out$err\"\n@@ -2725,7 +2725,7 @@ pq_reset\n pq_git \"$PQ_W\" checkout -q --detach \"$pq_S\"\n echo other > \"$PQ_W/c.txt\" && pq_git \"$PQ_W\" add -A && pq_git \"$PQ_W\" commit -q -m conflicting\n pq_git \"$PQ_W\" push -q -f origin HEAD:refs/heads/main\n-run pq_restack --prepare --verify true; st=$?\n+run pq_restack --keep-local --verify true; st=$?\n check \"a conflict: exit 3, aborted, the branch at A, nothing recorded\" \\\n   \"$( [ \"$st\" -eq 3 ] && contains \"$out\" \"CONFLICT\" && [ \"$(pq_safe)\" = yes ] \\\n       && [ -z \"$(pq_git \"$PQ_R\" status --porcelain)\" ] && echo yes || echo no )\" \"exit $st: $out$err\"\n@@ -2733,13 +2733,13 @@ pq_reset\n pq_git \"$PQ_W\" checkout -q --detach \"$pq_S\"\n echo child > \"$PQ_W/c.txt\" && pq_git \"$PQ_W\" add -A && pq_git \"$PQ_W\" commit -q -m \"the child's change, upstream\"\n pq_git \"$PQ_W\" push -q -f origin HEAD:refs/heads/main\n-run pq_restack --prepare --verify true; st=$?\n+run pq_restack --keep-local --verify true; st=$?\n check \"a dropped commit: exit 4, the branch at A, nothing recorded\" \\\n   \"$( [ \"$st\" -eq 4 ] && contains \"$out\" \"COMMITS DISAPPEARED\" && [ \"$(pq_safe)\" = yes ] && echo yes || echo no )\" \"exit $st: $out$err\"\n pq_reset\n pq_git \"$PQ_R\" checkout -q --detach\n pq_git \"$PQ_R\" worktree add -q \"$pq/elsewhere\" \"$PQ_B\" 2>/dev/null\n-run pq_restack --prepare --verify true; st=$?\n+run pq_restack --keep-local --verify true; st=$?\n pq_git \"$PQ_R\" worktree remove --force \"$pq/elsewhere\"\n pq_git \"$PQ_R\" checkout -q \"$PQ_B\"\n check \"the branch checked out in another worktree: exit 5, named, nothing moved\" \\\n@@ -2748,19 +2748,19 @@ check \"the branch checked out in another worktree: exit 5, named, nothing moved\"\n pq_reset\n echo more > \"$PQ_R/more.txt\" && pq_git \"$PQ_R\" add -A && pq_git \"$PQ_R\" commit -q -m unpushed\n pq_ahead=$(pq_local)\n-run pq_restack --prepare --verify true; st=$?\n+run pq_restack --keep-local --verify true; st=$?\n check \"local commits origin does not have: exit 5, kept\" \\\n   \"$( [ \"$st\" -eq 5 ] && contains \"$err\" \"holds commits origin does not\" && [ \"$(pq_local)\" = \"$pq_ahead\" ] \\\n-      && [ \"$(pq_meta restack_prepared)\" = \"<none>\" ] && echo yes || echo no )\" \"exit $st: $err\"\n+      && [ \"$(pq_meta restack_unpushed)\" = \"<none>\" ] && echo yes || echo no )\" \"exit $st: $err\"\n pq_reset\n-run pq_restack --prepare --dry-run; st=$?\n-check \"--prepare with --dry-run is refused\" \"$( [ \"$st\" -eq 1 ] && [ \"$(pq_safe)\" = yes ] && echo yes || echo no )\" \"exit $st: $err\"\n+run pq_restack --keep-local --dry-run; st=$?\n+check \"--keep-local with --dry-run is refused\" \"$( [ \"$st\" -eq 1 ] && [ \"$(pq_safe)\" = yes ] && echo yes || echo no )\" \"exit $st: $err\"\n \n # --- 5. --dry-run as before\n pq_reset\n run pq_restack --dry-run --verify true; st=$?\n-check \"--dry-run on a reviewed ticket still refuses before touching anything, and names --prepare\" \\\n-  \"$( [ \"$st\" -eq 6 ] && contains \"$err\" \"REFUSING: Ethan reviews PRI-173's code\" && contains \"$err\" \"kk-restack PRI-173 --prepare\" \\\n+check \"--dry-run on a reviewed ticket still refuses before touching anything, and names --keep-local\" \\\n+  \"$( [ \"$st\" -eq 6 ] && contains \"$err\" \"REFUSING: Ethan reviews PRI-173's code\" && contains \"$err\" \"kk-restack PRI-173 --keep-local\" \\\n       && [ \"$(pq_safe)\" = yes ] && echo yes || echo no )\" \"exit $st: $err\"\n board=\"$pq/board-plain.json\"\n pq_heads0=$(pq_git \"$PQ_R\" for-each-ref --format='%(refname) %(objectname)' refs/heads)\n",
+      "language": "bash"
+    }
+  ],
+  "intent": {
+    "summary": "Rename the kk-restack flag `--prepare` to `--keep-local` and the associated ticket-metadata key `restack_prepared` to `restack_unpushed` so the name describes what the flag leaves behind (a verified rebase sitting on the local branch) rather than a vague notion of 'preparing'.",
+    "reasoning": "The author's description explicitly states the old name 'did not say what it leaves behind' and the new name documents that the record is 'a restack not yet pushed.' The diff is a consistent, mechanical rename across the CLI flag, the persisted metadata key, in-script comments, error/help text, agent/skill documentation, and the test suite \u2014 no new logic or control flow is introduced.",
+    "confidence": 0.95
+  },
+  "impact_map": {
+    "direct_impacts": [
+      {
+        "area": "kk-restack.sh CLI interface",
+        "description": "`--prepare` no longer exists; callers must use `--keep-local`. All help text, usage strings, and error messages updated to match.",
+        "severity": "medium"
+      },
+      {
+        "area": "Ticket metadata schema (restack_prepared -> restack_unpushed)",
+        "description": "kk-restack writes, kk-dispatch reads/deletes, and kk-packet reads this key under its new name consistently within this commit.",
+        "severity": "medium"
+      },
+      {
+        "area": "Documentation (agents/*, skills/*/references/stacking.md, SKILL.md)",
+        "description": "All operator-facing docs and agent instructions updated to reference the new flag/key names, keeping guidance consistent with behavior.",
+        "severity": "low"
+      },
+      {
+        "area": "Test suite (run-tests.sh, tests/README.md)",
+        "description": "Test section titles, invocations, and assertions (e.g. 'already kept locally' output string) updated to match the renamed flag/key and new user-facing strings.",
+        "severity": "low"
+      }
+    ],
+    "indirect_impacts": [
+      {
+        "area": "In-flight ticket metadata from before this deploy",
+        "description": "Any ticket that already has a `restack_prepared` key set (from a kk-restack --prepare run prior to this change) will not be recognized by the new code, which only looks for `restack_unpushed`. kk-dispatch's settle_restack and kk-packet's parent_merged check will silently skip these, potentially leaving stale parent_tip_sha/parent_branch metadata indefinitely.",
+        "severity": "high"
+      },
+      {
+        "area": "External automation or muscle-memory invoking `--prepare`",
+        "description": "Any wrapper scripts, aliases, cron jobs, or human habits that call `kk-restack ... --prepare` will now fail with an unrecognized-flag style error (depends on how unknown flags are handled) instead of being silently accepted.",
+        "severity": "medium"
+      },
+      {
+        "area": "Other copies of these scripts outside skills/engineering-manager",
+        "description": "The repo root lists both `multica-skills` and `recovered-skills` directories alongside `skills`; if either contains duplicate/forked copies of kk-restack.sh, kk-dispatch.sh, etc., they may still reference the old names and silently diverge.",
+        "severity": "medium"
+      }
+    ],
+    "affected_components": [
+      "kk-restack.sh",
+      "kk-dispatch.sh",
+      "kk-grant.sh",
+      "kk-may.sh",
+      "kk-packet.sh",
+      "stack-manager.md (both variants)",
+      "gatekeeper.md (both variants)",
+      "engineering-manager SKILL.md",
+      "stacking.md reference",
+      "run-tests.sh",
+      "tests/README.md",
+      "ticket metadata store (via multica issue metadata)"
+    ]
+  },
+  "risk_assessment": {
+    "overall_risk": "medium",
+    "risks": [
+      {
+        "description": "Metadata key rename is not backward compatible with data already persisted under the old key name (`restack_prepared`) on real tickets created before this deploy.",
+        "severity": "high",
+        "mitigation": "Add a one-time migration (read both keys, or rename `restack_prepared` to `restack_unpushed` on tickets that have it) before or during rollout, or have kk-dispatch/kk-packet fall back to the old key name for a transition period.",
+        "edge_cases": [
+          "A ticket mid-review-chain-break-packet flow at deploy time: kk-restack already wrote `restack_prepared`, but after deploy kk-dispatch/kk-packet only look for `restack_unpushed`, so the stack metadata (parent_tip_sha, parent_branch) never settles even after the force-push lands.",
+          "A packet already built referencing the old record format but settled logic now checks a key that was never written for it."
+        ]
+      },
+      {
+        "description": "Flag rename breaks any external invocation using `--prepare`, with no deprecation/alias period.",
+        "severity": "medium",
+        "mitigation": "Consider accepting `--prepare` as a hidden deprecated alias for `--keep-local` for a release or two, emitting a warning, to avoid hard breaks for scripts/agents not yet updated.",
+        "edge_cases": [
+          "CI pipelines, personal shell aliases, or other agent configs (outside this repo's tracked files) still pass `--prepare`."
+        ]
+      },
+      {
+        "description": "Possible incomplete rename if duplicate script copies exist elsewhere in the repo (e.g., `multica-skills/`, `recovered-skills/`) that were not part of this diff.",
+        "severity": "medium",
+        "mitigation": "Grep the full repository tree (not just skills/engineering-manager) for `--prepare` and `restack_prepared` to confirm no stale references remain.",
+        "edge_cases": [
+          "A 'recovered' or archived skill snapshot still documents/implements `--prepare`, confusing future readers or agents that pull from the wrong path."
+        ]
+      }
+    ],
+    "breaking_changes": true,
+    "requires_migration": true
+  },
+  "review_questions": [
+    {
+      "question": "Is there any ticket currently holding a `restack_prepared` metadata key written by the old kk-restack binary before this deploy? If so, how will it be migrated to `restack_unpushed` (or will kk-dispatch/kk-packet temporarily read both keys)?",
+      "context": "kk-dispatch's settle_restack and kk-packet's parent_merged check now exclusively look up `restack_unpushed`. Any in-flight restack prepared under the old key would never be settled, silently leaving parent_tip_sha/parent_branch stale.",
+      "priority": "critical"
+    },
+    {
+      "question": "Does kk-restack (or any caller) need a deprecated `--prepare` alias during rollout, or is a hard break acceptable given how `--prepare` is invoked (humans, agents, CI)?",
+      "context": "The flag rename has no backward-compatible alias; anything still invoking `--prepare` will fail immediately after deploy.",
+      "priority": "high"
+    },
+    {
+      "question": "Were `multica-skills/` and `recovered-skills/` (visible as top-level directories in this repo) checked for other copies of kk-restack.sh or kk-dispatch.sh that also reference `--prepare`/`restack_prepared`?",
+      "context": "These directories weren't shown in the diff; if they contain duplicate/forked scripts, the rename may be incomplete elsewhere in the repo, and I cannot verify their contents from what was provided.",
+      "priority": "medium"
+    },
+    {
+      "question": "Was the full `run-tests.sh` suite executed end-to-end after the rename to confirm all renamed output strings (e.g., 'already kept locally', 'kept $ident's restack locally') exactly match their corresponding `check` assertions?",
+      "context": "Several user-facing strings changed wording (not just the flag/key token), e.g. 'prepared $ident' -> 'kept $ident's restack locally', so a typo mismatch between script output and test assertion would cause silent test failures or false passes if grep patterns are loose.",
+      "priority": "medium"
+    }
+  ],
+  "analysis_model": "claude-sonnet-5",
+  "analysis_timestamp": "2026-11-03T07:59:18.152974",
+  "tokens_used": 21664,
+  "diff_coverage": {
+    "budget_tokens": 60000,
+    "shown_lines": 180,
+    "total_lines": 180,
+    "trimmed": [],
+    "omitted": [],
+    "noise": [],
+    "percent": 100
+  }
+}

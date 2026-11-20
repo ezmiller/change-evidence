@@ -1,0 +1,70 @@
+[
+  {
+    "hunk/id": "h:b9a201e6",
+    "display/id": "H-020",
+    "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+    "lines": {
+      "old": {
+        "start": 319,
+        "count": 7
+      },
+      "new": {
+        "start": 319,
+        "count": 7
+      }
+    },
+    "classification": "code",
+    "diff/header": "@@ -319,7 +319,7 @@"
+  },
+  {
+    "hunk/id": "h:20d49c70",
+    "display/id": "H-021",
+    "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+    "lines": {
+      "old": {
+        "start": 346,
+        "count": 7
+      },
+      "new": {
+        "start": 346,
+        "count": 7
+      }
+    },
+    "classification": "code",
+    "diff/header": "@@ -346,7 +346,7 @@"
+  },
+  {
+    "hunk/id": "h:9fd36116",
+    "display/id": "H-022",
+    "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+    "lines": {
+      "old": {
+        "start": 408,
+        "count": 11
+      },
+      "new": {
+        "start": 408,
+        "count": 25
+      }
+    },
+    "classification": "code",
+    "diff/header": "@@ -408,11 +408,25 @@"
+  },
+  {
+    "hunk/id": "h:62962ed7",
+    "display/id": "H-023",
+    "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+    "lines": {
+      "old": {
+        "start": 488,
+        "count": 6
+      },
+      "new": {
+        "start": 502,
+        "count": 7
+      }
+    },
+    "classification": "code",
+    "diff/header": "@@ -488,6 +502,7 @@"
+  }
+]

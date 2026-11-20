@@ -1,0 +1,28 @@
+diff --git a/skills/engineering-manager/scripts/kk-packet.sh b/skills/engineering-manager/scripts/kk-packet.sh
+index aac89e7..35bc349 100644
+--- a/skills/engineering-manager/scripts/kk-packet.sh
++++ b/skills/engineering-manager/scripts/kk-packet.sh
+@@ -292,8 +292,9 @@ if [ "$cmd" = import ]; then
+   project=$(kk-project "$project_arg") || exit 1
+   pr=$(gh pr view "$pr_url" --json number,title,body,url,author,baseRefOid,headRefOid,baseRefName,headRefName </dev/null) \
+     || die "gh could not read $pr_url; nothing was created" 4
+-  is_sha "$(jq -r '.headRefOid // ""' <<< "$pr")" && is_sha "$(jq -r '.baseRefOid // ""' <<< "$pr")" \
+-    || die "gh returned no base and head commit for $pr_url" 4
++  if ! { is_sha "$(jq -r '.headRefOid // ""' <<< "$pr")" && is_sha "$(jq -r '.baseRefOid // ""' <<< "$pr")"; }; then
++    die "gh returned no base and head commit for $pr_url" 4
++  fi
+   pr_url=$(jq -r '.url' <<< "$pr")
+   found=$(kk_issue_list --project "$project" --metadata "pr_url=$pr_url" 2>/dev/null \
+             | jq -r '[.issues[]? | select(.metadata.review_kind == "external")] | .[0].identifier // empty') \
+@@ -941,8 +942,9 @@ start|ensure)
+   if [ "$external" = true ]; then
+     [ -z "$pr_stale" ] \
+       || die "$ticket is STALE: PR #$pr_number moved to ${pr_stale:0:12}. Its review stays bound to ${review_head:0:12}; nothing is built." 7
+-    is_sha "$review_head" && is_sha "$review_base" \
+-      || die "$ticket records no pinned PR base and head; run kk-packet import again" 4
++    if ! { is_sha "$review_head" && is_sha "$review_base"; }; then
++      die "$ticket records no pinned PR base and head; run kk-packet import again" 4
++    fi
+     if { [ -n "$base_ref" ] && [ "$base_ref" != "$review_base" ]; } || { [ -n "$head_ref" ] && [ "$head_ref" != "$review_head" ]; }; then
+       die "$ticket is pinned to PR #$pr_number's base and head; --base and --head cannot change them"
+     fi

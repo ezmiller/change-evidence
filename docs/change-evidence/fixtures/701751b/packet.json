@@ -1,0 +1,891 @@
+{
+  "chain" : {
+    "links" : [ ],
+    "mode" : "full",
+    "predecessor" : null,
+    "reason" : "first",
+    "reason/text" : "No earlier packet on this ticket was reviewed, so this packet covers the whole change."
+  },
+  "collapsed" : [ ],
+  "comprehension" : {
+    "findings" : [ {
+      "criterion" : "sections",
+      "request" : "H-005 (the essay writer's brief) does not carry the break to the approval service. Either move it to showing-the-break, where it serves the same goal of making the page and essay agree, or open the section by saying it also covers the brief.",
+      "section" : "recording-the-break",
+      "severity" : "advisory"
+    }, {
+      "criterion" : "overview",
+      "request" : "The overview uses 'lease' before any section defines it. Gloss it there as 'the commit origin must still hold'.",
+      "severity" : "advisory"
+    }, {
+      "criterion" : "language",
+      "request" : "Say once what the 'review chain' is (the series of packets on one ticket, each following the last), in context before 'chain reason' and 'chain break' first appear. In the tests list, say what 'the Squint checks' are or drop the name.",
+      "severity" : "advisory"
+    } ],
+    "narrative/digest" : "sha256:5e83568b113ebf1e5e4acf471d63df4e6fdcbdd712011ba26bbe41077c32e5f3",
+    "packet/id" : "p-20261101-88dfd0",
+    "recorded-at" : "2026-11-03T12:50:36.626079440Z",
+    "understanding" : {
+      "approach" : "Detect the rewrite once, at build time, and record it with the commit origin holds as a fixed fact covered by the packet's fingerprint. Then make every later step read that one record: the page shows it prominently, the history log carries it to the approval service, and approval may offer a force-push that can overwrite only that recorded origin commit.",
+      "in-plain-words" : "When someone rewrites a branch after it was reviewed, the review tool used to mention it in a faint line and offered no way to publish the result. Now it detects the rewrite, records which commit the server copy of the branch points to, and opens the review page with a clear warning that lists the relevant commits. Approval can also allow an overwrite of the server's branch, but only if the branch still points to the commit that was recorded. That condition is checked on the server twice, and the push tool refuses if anything has moved.",
+      "peripheral" : "The approval panel changes (extra rows and a lease line) are display only and decide nothing. The page's CSS is styling. The brief to the essay writer keeps the essay consistent with the break section.",
+      "problem" : "After a rebase the reviewed commit is no longer in the branch, so no 'what changed since' diff exists. The page fell back to the whole change but said so in one faint line, with no commit hashes and no clear link to the earlier review. And because a rebased branch already on origin can only be published by overwriting it, while approval could not grant a force-push, such a branch could not be published through approval at all.",
+      "reading-order" : "Each step consumes the previous one's output: the build creates the fact; the page shows it to Ethan; the log carries it to the service that cannot see the page; only then can the service offer a force-push bound to it. The panel display comes last because it only shows what the service decided.",
+      "risks" : "The origin commit is whatever was last fetched, so a stale fetch yields a lease Gatekeeper will refuse, and Ethan must decide again. Three new fields in the status summary may break exact comparisons. Packets built from a bare commit record no remote and offer no force-push. Safety relies on Gatekeeper's existing refusal when origin has moved. Nothing was run: no tests in this commit, the suite not run here, shellcheck not run, and the panel never opened in a browser.",
+      "sections" : [ {
+        "advances" : "The build script looks up origin's last-fetched commit for the branch and passes it in; the model writes a chain-break record only when the earlier review's commit was rewritten away (not an ancestor, or gone), and the fingerprint covers it so it cannot be changed later.",
+        "id" : "noticing-the-break"
+      }, {
+        "advances" : "The page opens, above the title, with a red-edged section that says why there is no diff, links the earlier review, lists the four commits that matter, and says what approval can do about origin; the old faint line is dropped for these packets.",
+        "id" : "showing-the-break"
+      }, {
+        "advances" : "Because the approval service reads the ticket's log, not the page, the break fields are written into the log's build entry, kept when the log is replayed, and returned in the status summary the service reads. The essay writer is also told to treat the packet as a fresh review.",
+        "id" : "recording-the-break"
+      }, {
+        "advances" : "A fourth choice, approve and force-push, appears only on a break where origin holds a different commit. The commit it may overwrite (the lease) is held on the server with the one-time confirmation code, never taken from the browser, and the recording script checks it again against the log before granting.",
+        "id" : "approving-a-force-push"
+      } ],
+      "system" : "A pre-push review pipeline: before code leaves the machine, a tool builds Ethan a static review page for the change, a small approval service records what Ethan decides in the ticket's history log, and a separate job (Gatekeeper) then pushes only what that decision permits. When a branch changes after a review, the next page is normally a follow-up showing only what changed since the reviewed commit."
+    },
+    "verdict" : "pass"
+  },
+  "facts/digest" : "sha256:f5da61de811a20873765d2e1b888f04d1e37d107bb5543b22c2043d4b1dedce6",
+  "files" : [ {
+    "binary?" : false,
+    "hunks" : [ "h:fdcada2c" ],
+    "path" : "skills/engineering-manager/scripts/kk-approval.sh",
+    "role" : "exposes break fields in `packet_facts`",
+    "stats" : {
+      "added" : 2,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:b1520903", "h:0eceb919", "h:65839893" ],
+    "path" : "skills/engineering-manager/scripts/kk-packet-approval.sh",
+    "role" : "grants force-push only at the recorded lease",
+    "stats" : {
+      "added" : 19,
+      "hunks" : 3,
+      "removed" : 6
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:31ff6657", "h:38c319af" ],
+    "path" : "skills/engineering-manager/scripts/kk-packet.sh",
+    "role" : "logs break fields; briefs the writer on breaks",
+    "stats" : {
+      "added" : 4,
+      "hunks" : 2,
+      "removed" : 1
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:56882625" ],
+    "path" : "skills/engineering-manager/scripts/kk-review-packet.sh",
+    "role" : "records origin's branch head for the build",
+    "stats" : {
+      "added" : 14,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:57c08944" ],
+    "path" : "skills/engineering-manager/scripts/lib/kk-approval.sh",
+    "role" : "keeps break fields when replaying history",
+    "stats" : {
+      "added" : 3,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:fb60a1a1", "h:9c2ca579", "h:104253b6", "h:001d5dc0", "h:8d03ccfe" ],
+    "path" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+    "role" : "offers force-push, lease held on the server",
+    "stats" : {
+      "added" : 36,
+      "hunks" : 5,
+      "removed" : 17
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:131fb101", "h:57deced0", "h:5ee49f0a" ],
+    "path" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+    "role" : "shows the remote head and lease",
+    "stats" : {
+      "added" : 8,
+      "hunks" : 3,
+      "removed" : 3
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:2c07278d", "h:9529622d", "h:058f6cc4" ],
+    "path" : "skills/engineering-manager/scripts/review-packet/build.clj",
+    "role" : "passes remote ref and head to the model",
+    "stats" : {
+      "added" : 7,
+      "hunks" : 3,
+      "removed" : 3
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:b9a201e6", "h:20d49c70", "h:9fd36116", "h:62962ed7" ],
+    "path" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+    "role" : "adds the `chain-break` fact",
+    "stats" : {
+      "added" : 19,
+      "hunks" : 4,
+      "removed" : 4
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:b24795aa", "h:7ea2f936", "h:e7744454" ],
+    "path" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+    "role" : "draws the break section before the title",
+    "stats" : {
+      "added" : 52,
+      "hunks" : 3,
+      "removed" : 2
+    },
+    "status" : "modified"
+  } ],
+  "gaps" : [ "This commit holds no tests and none of the contract or approval docs the hand-off lists.", "The approval panel's new rows and lease line were never run in a browser.", "The new writer-brief line for break packets has no direct test." ],
+  "hunks" : {
+    "h:001d5dc0" : {
+      "classification" : "code",
+      "diff/header" : "@@ -186,6 +202,8 @@",
+      "display/id" : "H-012",
+      "file" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H4",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 202
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 186
+        }
+      },
+      "patch" : "@@ -186,6 +202,8 @@\n          (cond\n            (not (and issued (= login (:login issued)) (= pid (:packet issued))))\n            {:status 403 :body {:error \"This confirmation was not issued to you for this packet. Refresh.\"}}\n+           (and (= \"force-push\" delivery) (nil? (:lease s)))\n+           {:status 409 :body {:error \"This confirmation offered no force-push.\" :stale true :next \"Refresh to see the packet as it is now.\"}}\n            (and used (not= delivery (:delivery used)))\n            {:status 409 :body {:error (str \"This confirmation was already used to choose \" (:delivery used) \".\")\n                                :stale true :next \"Refresh to decide again.\"}}\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 0
+      }
+    },
+    "h:058f6cc4" : {
+      "classification" : "code",
+      "diff/header" : "@@ -160,7 +162,9 @@",
+      "display/id" : "H-019",
+      "file" : "skills/engineering-manager/scripts/review-packet/build.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/build.clj H3",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 162
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 160
+        }
+      },
+      "patch" : "@@ -160,7 +162,9 @@\n                                                       {:predecessor predecessor :head since\n                                                        :reason (when-not step (:reason chain))})\n                                       :step-paths step-paths\n-                                      :history (chain/history packets rows)}\n+                                      :history (chain/history packets rows)\n+                                      :remote (when-not (str/blank? remote-ref)\n+                                                {:ref remote-ref :head (not-empty remote-head)})}\n                                      changed)\n           target (or (not-empty out) (str root \"/\" (:packet/id packet)))]\n       (when (and (str/blank? out) (.exists (io/file target)))\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 1
+      }
+    },
+    "h:0eceb919" : {
+      "classification" : "code",
+      "diff/header" : "@@ -24,8 +27,8 @@ fail() { echo \"kk-packet-approval: $1\" >&2; exit 12; }",
+      "display/id" : "H-003",
+      "file" : "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet-approval.sh H2",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 27
+        },
+        "old" : {
+          "count" : 8,
+          "start" : 24
+        }
+      },
+      "patch" : "@@ -24,8 +27,8 @@ fail() { echo \"kk-packet-approval: $1\" >&2; exit 12; }\n cmd=${1:-}\n pid=${2:-}\n case \"$cmd:$#\" in\n-  status:2|dispatch:2|decide:12) ;;\n-  *) fail \"usage: kk-packet-approval status <packet-id> | dispatch <packet-id> | decide <packet-id> <none|push|pr> <actor> <device> <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|->\" ;;\n+  status:2|dispatch:2|decide:12|decide:13) ;;\n+  *) fail \"usage: kk-packet-approval status <packet-id> | dispatch <packet-id> | decide <packet-id> <none|push|pr|force-push> <actor> <device> <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|-> [<lease>]\" ;;\n esac\n printf '%s' \"$pid\" | grep -qE '^p-[0-9]{8}-[0-9a-f]{4,64}$' || fail \"'$pid' is not a packet id\"\n \n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 2
+      }
+    },
+    "h:104253b6" : {
+      "classification" : "code",
+      "diff/header" : "@@ -173,7 +188,8 @@",
+      "display/id" : "H-011",
+      "file" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H3",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 188
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 173
+        }
+      },
+      "patch" : "@@ -173,7 +188,8 @@\n   [cfg {:keys [login node]} pid {:keys [nonce delivery]}]\n   (cond\n     (not (contains? (:approvers cfg) login)) {:status 403 :body {:error \"This login may not approve.\"}}\n-    (not (some #(= delivery (:delivery %)) (choices \"\"))) {:status 400 :body {:error \"Choose none, push or pr. Nothing else can be granted here.\"}}\n+    (not (some #(= delivery (:delivery %)) (choices \"\" {:chain_break \"x\" :remote_head \"x\"})))\n+    {:status 400 :body {:error \"Choose none, push, pr or force-push. Nothing else can be granted here.\"}}\n     (not (and (string? nonce) (re-matches nonce-re nonce))) {:status 403 :body {:error \"This confirmation carries no nonce. Refresh.\"}}\n     :else\n     (store/with-lock\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 1
+      }
+    },
+    "h:131fb101" : {
+      "classification" : "code",
+      "diff/header" : "@@ -1,8 +1,9 @@",
+      "display/id" : "H-014",
+      "file" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H1",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 8,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1,8 +1,9 @@\n (ns review-feedback.approval\n   \"Approve this packet (PER-78): one decision that approves the exact reviewed\n-   revision, ends pre-push review and picks its delivery — code only, push, or\n-   push and PR. The service decides what may be offered; this only shows it,\n-   asks for one confirmation, and never says Gatekeeper ran unless told so.\"\n+   revision, ends pre-push review and picks its delivery — code only, push,\n+   push and PR, or on a chain break a force-push at the recorded lease. The\n+   service decides what may be offered; this only shows it, asks for one\n+   confirmation, and never says Gatekeeper ran unless told so.\"\n   (:require [clojure.string :as str]))\n \n (def meta-el (js/document.querySelector \"meta[name=review-feedback]\"))\n",
+      "stats" : {
+        "added" : 4,
+        "removed" : 3
+      }
+    },
+    "h:20d49c70" : {
+      "classification" : "code",
+      "diff/header" : "@@ -346,7 +346,7 @@",
+      "display/id" : "H-021",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj H2",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 346
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 346
+        }
+      },
+      "patch" : "@@ -346,7 +346,7 @@\n    :stats. :files is here with each :role taken out, because the role is the\n    writer's.\"\n   [:packet/id :packet/version :packet/created-at :packet/expires-at :packet/url\n-   :ticket/id :repo/path :range :chain :since-review :history :summary :files :hunks])\n+   :ticket/id :repo/path :range :chain :since-review :chain-break :history :summary :files :hunks])\n \n (defn canonical\n   \"A value in one spelling whatever map types it went through: keys and\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:2c07278d" : {
+      "classification" : "code",
+      "diff/header" : "@@ -69,7 +69,8 @@",
+      "display/id" : "H-017",
+      "file" : "skills/engineering-manager/scripts/review-packet/build.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/build.clj H1",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 69
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 69
+        }
+      },
+      "patch" : "@@ -69,7 +69,8 @@\n \n (def flags #{\"--ticket\" \"--repo\" \"--base\" \"--head\" \"--base-ref\" \"--base-source\" \"--head-ref\"\n              \"--root\" \"--out\" \"--base-url\" \"--retention-days\" \"--now\" \"--merge-base\"\n-             \"--predecessor\" \"--since\" \"--since-status\" \"--fallback\" \"--history\"})\n+             \"--predecessor\" \"--since\" \"--since-status\" \"--fallback\" \"--history\"\n+             \"--remote-ref\" \"--remote-head\"})\n \n (defn parse-args [args]\n   (loop [[a v & more :as all] args acc {}]\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 1
+      }
+    },
+    "h:31ff6657" : {
+      "classification" : "code",
+      "diff/header" : "@@ -659,6 +659,7 @@ send_brief() {",
+      "display/id" : "H-005",
+      "file" : "skills/engineering-manager/scripts/kk-packet.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 659
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 659
+        }
+      },
+      "patch" : "@@ -659,6 +659,7 @@ send_brief() {\n   [ ! -s \"$sd/violations.txt\" ] || violations=$(cat \"$sd/violations.txt\")\n   follows=$(jq -r '(if .chain.mode == \"incremental\" then\n       \"Follow-up to packet \\(.chain.predecessor) (\\(.chain.links[-1].\"packet/url\")). This packet still holds the whole change against \\(.range.\"base/ref\"): argue all of it.\"\n+    elif .\"chain-break\" then \"Review chain break: \\(.\"chain\".\"reason/text\") There is no diff from \\(.\"chain-break\".predecessor), the last packet Ethan acted on, to this revision. Write about the whole change, and say in narrative.since that it is a fresh review of a rewritten history, not a step from \\(.\"chain-break\".predecessor).\"\n     elif (.chain.reason // \"first\") != \"first\" then \"Full packet: \\(.\"chain\".\"reason/text\") Write about the whole change.\"\n     else empty end),\n     (.\"since-review\" // empty\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 0
+      }
+    },
+    "h:38c319af" : {
+      "classification" : "code",
+      "diff/header" : "@@ -1018,7 +1019,9 @@ ERR",
+      "display/id" : "H-006",
+      "file" : "skills/engineering-manager/scripts/kk-packet.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet.sh H2",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 1019
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 1018
+        }
+      },
+      "patch" : "@@ -1018,7 +1019,9 @@ ERR\n       base: .range.base, head: .range.head, since: .chain.since,\n       base_ref: .range.\"base/ref\", base_source: .range.\"base/source\", predecessor: .chain.predecessor,\n       mode: .chain.mode, reason: .chain.reason, created_at: .\"packet/created-at\",\n-      url: .\"packet/url\", expires_at: .\"packet/expires-at\", key: $k, trigger: $t, at: $at}' \\\n+      url: .\"packet/url\", expires_at: .\"packet/expires-at\", key: $k, trigger: $t, at: $at}\n+      + (.\"chain-break\" // null | if . then {chain_break: .reason, remote_ref: .\"remote/ref\",\n+                                             remote_head: .\"remote/head\"} else {} end)' \\\n       \"$bundle/packet.json\")\"\n   rm -f \"$sd/pending.json\"\n \n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 1
+      }
+    },
+    "h:56882625" : {
+      "classification" : "code",
+      "diff/header" : "@@ -462,7 +462,21 @@ if [ -n \"$predecessor\" ]; then",
+      "display/id" : "H-007",
+      "file" : "skills/engineering-manager/scripts/kk-review-packet.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-review-packet.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 21,
+          "start" : 462
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 462
+        }
+      },
+      "patch" : "@@ -462,7 +462,21 @@ if [ -n \"$predecessor\" ]; then\n     since_status=\"not-descendant\"\n   fi\n fi\n+# PER-128: what origin held for the branch, as last fetched. A chain break may\n+# approve a force-push replacing exactly this commit.\n+head_branch=\"\"\n+if [ \"$head_ref\" = HEAD ]; then\n+  head_branch=$(git -C \"$repo\" symbolic-ref --quiet --short HEAD 2>/dev/null) || head_branch=\"\"\n+elif git -C \"$repo\" show-ref --verify --quiet \"refs/heads/$head_ref\"; then\n+  head_branch=$head_ref\n+fi\n chain_args=()\n+if [ -n \"$predecessor\" ] && [ -n \"$head_branch\" ]; then\n+  chain_args+=(--remote-ref \"origin/$head_branch\")\n+  if remote_head=$(git -C \"$repo\" rev-parse --verify --quiet \"refs/remotes/origin/$head_branch^{commit}\" 2>/dev/null); then\n+    chain_args+=(--remote-head \"$remote_head\")\n+  fi\n+fi\n [ -z \"$predecessor\" ] || chain_args+=(--predecessor \"$predecessor\" --since \"$since\" --since-status \"$since_status\")\n [ -z \"$fallback\" ] || chain_args+=(--fallback \"$fallback\")\n [ -z \"$history\" ] || chain_args+=(--history \"$history\")\n",
+      "stats" : {
+        "added" : 14,
+        "removed" : 0
+      }
+    },
+    "h:57c08944" : {
+      "classification" : "code",
+      "diff/header" : "@@ -45,7 +45,9 @@ def kk_ap_fold:",
+      "display/id" : "H-008",
+      "file" : "skills/engineering-manager/scripts/lib/kk-approval.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/lib/kk-approval.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 45
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 45
+        }
+      },
+      "patch" : "@@ -45,7 +45,9 @@ def kk_ap_fold:\n           .built += [$e.packet]\n           | .packets[$e.packet] = {packet: $e.packet, ticket: $e.ticket, head: $e.head, base: $e.base,\n               base_ref: $e.base_ref, mode: ($e.mode // null), predecessor: ($e.predecessor // null),\n-              since: ($e.since // null), expires_at: $e.expires_at, built_i: $i, ready: [], feedback: [],\n+              since: ($e.since // null), chain_break: ($e.chain_break // null),\n+              remote_ref: ($e.remote_ref // null), remote_head: ($e.remote_head // null),\n+              expires_at: $e.expires_at, built_i: $i, ready: [], feedback: [],\n               approved: [], stalled: false, key: ($e.key // null), trigger: ($e.trigger // \"asked\")}\n         elif .packets[$e.packet // \"\"] == null then .\n         elif $e.event == \"state\" and $e.state == \"ready\" then\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 1
+      }
+    },
+    "h:57deced0" : {
+      "classification" : "code",
+      "diff/header" : "@@ -98,6 +99,9 @@",
+      "display/id" : "H-015",
+      "file" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H2",
+      "lines" : {
+        "new" : {
+          "count" : 9,
+          "start" : 99
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 98
+        }
+      },
+      "patch" : "@@ -98,6 +99,9 @@\n    [:dt \"Digest\"] [:dd.ap-mono (:digest v)]\n    [:dt \"Reviewed head\"] [:dd.ap-mono (:head v)]\n    [:dt \"Base\"] [:dd.ap-mono (str (:base v) (when (:base-ref v) (str \" (\" (:base-ref v) \")\")))]\n+   (when (:chain-break v) [:dt \"Chain break\"]) (when (:chain-break v) [:dd (:chain-break v)])\n+   (when (:remote-head v) [:dt \"Remote head\"])\n+   (when (:remote-head v) [:dd.ap-mono (str (:remote-head v) (when (:remote-ref v) (str \" (\" (:remote-ref v) \")\")))])\n    [:dt \"Policy\"] [:dd (:policy v)]\n    [:dt \"Expires\"] [:dd (:expires-at v)]])\n \n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 0
+      }
+    },
+    "h:5ee49f0a" : {
+      "classification" : "code",
+      "diff/header" : "@@ -129,6 +133,7 @@",
+      "display/id" : "H-016",
+      "file" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H3",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 133
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 129
+        }
+      },
+      "patch" : "@@ -129,6 +133,7 @@\n      [:p [:strong (str \"Confirm: \" (:label c))]]\n      [facts (:view s)]\n      [:p (grants (:actions c))]\n+     (when (:lease c) [:p.ap-mono (str \"Lease: the remote must be at \" (:lease c))])\n      [:p (:consequence c)]\n      [:p.rf-hint (:never (:view s))]\n      [:div.rf-row\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 0
+      }
+    },
+    "h:62962ed7" : {
+      "classification" : "code",
+      "diff/header" : "@@ -488,6 +502,7 @@",
+      "display/id" : "H-023",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj H4",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 502
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 488
+        }
+      },
+      "patch" : "@@ -488,6 +502,7 @@\n      :warnings (warnings-for dirty? files))\n         packet (cond-> packet\n                  since-review (assoc-array :since-review (since-facts since-review step-paths files hunk-index))\n+                 (chain-break chain since-review remote) (assoc-array :chain-break (chain-break chain since-review remote))\n                  (seq history) (assoc-array :history (vec history)))]\n     ;; Last, over everything above: the pin every later step is held to.\n     (assoc-array packet :facts/digest (facts-digest packet))))\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 0
+      }
+    },
+    "h:65839893" : {
+      "classification" : "code",
+      "diff/header" : "@@ -73,12 +76,22 @@ if [ \"$cmd\" = dispatch ]; then",
+      "display/id" : "H-004",
+      "file" : "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet-approval.sh H3",
+      "lines" : {
+        "new" : {
+          "count" : 22,
+          "start" : 76
+        },
+        "old" : {
+          "count" : 12,
+          "start" : 73
+        }
+      },
+      "patch" : "@@ -73,12 +76,22 @@ if [ \"$cmd\" = dispatch ]; then\n   exit \"$rc\"\n fi\n \n-delivery=$3 actor=$4 device=$5 digest=$6 head=$7 base=$8 policy=$9 revision=${10} seen=${11} supersede=${12}\n+delivery=$3 actor=$4 device=$5 digest=$6 head=$7 base=$8 policy=$9 revision=${10} seen=${11} supersede=${12} lease=${13:-}\n+[ -z \"$lease\" ] || [ \"$delivery\" = force-push ] || fail \"a lease is for force-push only\"\n case \"$delivery\" in\n   none) actions=() ;;\n   push) actions=(--action push) ;;\n   pr) actions=(--action push --action pr) ;;\n-  *) fail \"'$delivery' is not a delivery choice: none, push or pr\" ;;\n+  force-push)\n+    # Only the remote head this packet recorded on a chain break, and only while\n+    # it is still this ticket's newest packet: kk-approval decides the rest.\n+    facts=$(kk-approval status \"$ticket\" --output json \"${ws[@]+\"${ws[@]}\"}\") || exit $?\n+    jq -e --arg p \"$pid\" --arg l \"$lease\" --arg h \"$head\" \\\n+       '.packet == $p and .packet_facts.chain_break != null and .packet_facts.remote_head == $l and $l != $h' \\\n+       <<< \"$facts\" >/dev/null \\\n+      || fail \"force-push needs a chain-break packet and, as its lease, the remote head that packet recorded\"\n+    actions=(--action force-push --lease \"$lease\") ;;\n+  *) fail \"'$delivery' is not a delivery choice: none, push, pr or force-push\" ;;\n esac\n printf '%s' \"$device\" | grep -qE '^[a-z0-9][a-z0-9-]{0,62}$' || fail \"'$device' is not a device name\"\n printf '%s' \"$digest\" | grep -qE '^sha256:[0-9a-f]{64}$' || fail \"'$digest' is not a packet digest\"\n",
+      "stats" : {
+        "added" : 12,
+        "removed" : 2
+      }
+    },
+    "h:7ea2f936" : {
+      "classification" : "code",
+      "diff/header" : "@@ -476,6 +518,7 @@",
+      "display/id" : "H-025",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj H2",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 518
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 476
+        }
+      },
+      "patch" : "@@ -476,6 +518,7 @@\n          \" <span class=\\\"dot\\\">·</span> <span class=\\\"pid\\\">\"\n          (esc (:packet/id packet)) \"</span></p>\"\n          (history-section packet)\n+         (break-section packet)\n          \"<h1>\" (if-let [t (present (:title n))] (blk \"title\" t) (esc (:ticket/id packet))) \"</h1>\"\n          (labelled \"context\" \"the system\" (:context n))\n          (labelled \"problem\" \"the problem\" (:problem n))\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 0
+      }
+    },
+    "h:8d03ccfe" : {
+      "classification" : "code",
+      "diff/header" : "@@ -200,10 +218,11 @@",
+      "display/id" : "H-013",
+      "file" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H5",
+      "lines" : {
+        "new" : {
+          "count" : 11,
+          "start" : 218
+        },
+        "old" : {
+          "count" : 10,
+          "start" : 200
+        }
+      },
+      "patch" : "@@ -200,10 +218,11 @@\n            (do\n              (when-not used\n                (store/create-once! (nonce-file cfg pid nonce \".used\") (pr-str {:delivery delivery :login login :at (store/now)})))\n-             (let [{:keys [exit json err]} (run cfg \"decide\" pid delivery login (str node)\n+             (let [{:keys [exit json err]} (apply run cfg \"decide\" pid delivery login (str node)\n                                                 (str (:digest s)) (str (:head s)) (str (:base s)) (str (:policy s))\n                                                 (if (:revision s) (str (:revision s)) \"-\")\n-                                                (str (:feedback s)) (or (:supersede s) \"-\"))]\n+                                                (str (:feedback s)) (or (:supersede s) \"-\")\n+                                                (when (= \"force-push\" delivery) [(:lease s)]))]\n                (if (and (= 0 exit) (map? json))\n                  (do (store/write-atomic! (nonce-file cfg pid nonce \".result\") (pr-str json))\n                      (recorded cfg login pid json))\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 2
+      }
+    },
+    "h:9529622d" : {
+      "classification" : "code",
+      "diff/header" : "@@ -119,7 +120,8 @@",
+      "display/id" : "H-018",
+      "file" : "skills/engineering-manager/scripts/review-packet/build.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/build.clj H2",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 120
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 119
+        }
+      },
+      "patch" : "@@ -119,7 +120,8 @@\n \n (defn run [args]\n   (let [{:keys [ticket repo base head base-ref base-source head-ref root out base-url\n-                retention-days now merge-base predecessor since since-status fallback history]\n+                retention-days now merge-base predecessor since since-status fallback history\n+                remote-ref remote-head]\n          :or {retention-days \"14\"}}\n         (validate (parse-args args))\n         now (if (str/blank? now) (Instant/now) (Instant/parse now))\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 1
+      }
+    },
+    "h:9c2ca579" : {
+      "classification" : "code",
+      "diff/header" : "@@ -123,15 +136,17 @@",
+      "display/id" : "H-010",
+      "file" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H2",
+      "lines" : {
+        "new" : {
+          "count" : 17,
+          "start" : 136
+        },
+        "old" : {
+          "count" : 15,
+          "start" : 123
+        }
+      },
+      "patch" : "@@ -123,15 +136,17 @@\n           d (:decision json)\n           b (blocked cfg login pid json)\n           shown {:ticket (:ticket json) :digest (:digest f) :head (:head f) :base (:base f) :policy (:policy json)\n-                 :revision (:issue_revision json) :feedback (:blocking_feedback f) :supersede (:id d)}]\n+                 :revision (:issue_revision json) :feedback (:blocking_feedback f) :supersede (:id d)\n+                 :lease (lease f)}]\n       {:status 200\n-       :body (merge (dissoc shown :supersede :feedback)\n+       :body (merge (dissoc shown :supersede :feedback :lease)\n                     {:packet pid :base-ref (:base_ref f) :expires-at (:expires_at f)\n+                     :chain-break (:chain_break f) :remote-ref (:remote_ref f) :remote-head (:remote_head f)\n                      :decision (when d (assoc (decision-view d (:publication json)) :valid (:valid json) :reasons (mapv :text (:reasons json))))\n                      :blocked b\n-                     :never never}\n+                     :never (if (:lease shown) never-on-break never)}\n                     (when-not b\n-                      (merge {:choices (choices (:head f))} (issue-nonce! cfg login pid shown))))})))\n+                      (merge {:choices (choices (:head f) f)} (issue-nonce! cfg login pid shown))))})))\n \n (defn view\n   \"What the approval panel shows. A nonce only when there is something to\n",
+      "stats" : {
+        "added" : 6,
+        "removed" : 4
+      }
+    },
+    "h:9fd36116" : {
+      "classification" : "code",
+      "diff/header" : "@@ -408,11 +408,25 @@",
+      "display/id" : "H-022",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj H3",
+      "lines" : {
+        "new" : {
+          "count" : 25,
+          "start" : 408
+        },
+        "old" : {
+          "count" : 11,
+          "start" : 408
+        }
+      },
+      "patch" : "@@ -408,11 +408,25 @@\n                                       (array-map :path p :restored? true)))\n                             step-paths))))\n \n+(def rewrites\n+  \"Chain reasons that mean the reviewed history was rewritten (PER-128).\"\n+  #{:not-descendant :predecessor-head-missing})\n+\n+(defn- chain-break\n+  \"A follow-up whose last reviewed head is no longer in the branch's history:\n+   no packet-to-packet diff can be trusted, so the review starts again from the\n+   whole change. `remote` is what origin held for the branch at build time.\"\n+  [chain since-review remote]\n+  (when (and since-review (rewrites (:reason chain)))\n+    (array-map :reason (:reason chain) :reason/text (:reason/text chain)\n+               :predecessor (:predecessor since-review) :reviewed-head (:head since-review)\n+               :remote/ref (:ref remote) :remote/head (:head remote))))\n+\n (defn build-packet\n   \"`changed` is `[{:record … :block …}]` from `gitdiff/changed-files`.\n-   `since-review`, `step-paths` and `history` are for a follow-up only.\"\n+   `since-review`, `step-paths`, `history` and `remote` are for a follow-up only.\"\n   [{:keys [ticket repo base head base-ref base-source head-ref merge-base? base-url\n-           retention-days now dirty? chain since-review step-paths history]}\n+           retention-days now dirty? chain since-review step-paths history remote]}\n    changed]\n   (let [built (mapv #(build-file (:record %) (:block %)) changed)\n         labelled (label-per-file (assign-ids (mapcat :hunks built)))\n",
+      "stats" : {
+        "added" : 16,
+        "removed" : 2
+      }
+    },
+    "h:b1520903" : {
+      "classification" : "code",
+      "diff/header" : "@@ -2,12 +2,15 @@",
+      "display/id" : "H-002",
+      "file" : "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-packet-approval.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 15,
+          "start" : 2
+        },
+        "old" : {
+          "count" : 12,
+          "start" : 2
+        }
+      },
+      "patch" : "@@ -2,12 +2,15 @@\n # for the approval controls on a packet's page:\n #\n #   kk-packet-approval status <packet-id>\n-#   kk-packet-approval decide <packet-id> <none|push|pr> <actor> <device>\n+#   kk-packet-approval decide <packet-id> <none|push|pr|force-push> <actor> <device>\n #                      <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|->\n+#                      [<lease>]\n #   kk-packet-approval dispatch <packet-id>\n #\n # The ticket comes from the route kk-packet recorded. The only grants it can\n-# make are push, and pr with push; never force-push, review-request or merge.\n+# make are push, pr with push, and on a review-chain break (PER-128) a\n+# force-push whose lease is the remote head the packet recorded; never\n+# review-request or merge.\n # status adds kk-dispatch's status as `publication`; dispatch hands a pending\n # Gatekeeper job over (PER-83), after arming a kk-watch in the packet's session\n # (PER-95). KKPA_* are prepended by modules/kingkong-manager.nix.\n",
+      "stats" : {
+        "added" : 5,
+        "removed" : 2
+      }
+    },
+    "h:b24795aa" : {
+      "classification" : "code",
+      "diff/header" : "@@ -464,11 +464,53 @@",
+      "display/id" : "H-024",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj H1",
+      "lines" : {
+        "new" : {
+          "count" : 53,
+          "start" : 464
+        },
+        "old" : {
+          "count" : 11,
+          "start" : 464
+        }
+      },
+      "patch" : "@@ -464,11 +464,53 @@\n                 \"</ul>\"\n                 (when (str/blank? hunks)\n                   (str \"<p>\" (step-link predecessor (:packet/id packet) \"step.html\") \"</p>\")))\n-           (str \"<p class=\\\"empty\\\">No packet-to-packet diff: \"\n+           (when-not (:chain-break packet)\n+            (str \"<p class=\\\"empty\\\">No packet-to-packet diff: \"\n                 (esc (if (rebased reason) \"the branch was rebased\" (str/replace (str (get-in packet [:chain :reason/text])) #\"\\.$\" \"\")))\n-                \".</p>\"))\n+                \".</p>\")))\n          \"</section>\"))))\n \n+(defn- break-remote\n+  \"What the remote holds, and what approval may do about it (PER-128).\"\n+  [{rref :remote/ref rhead :remote/head} head]\n+  (cond\n+    (nil? rref) \"Its remote head was not recorded, so this page cannot approve a force-push.\"\n+    (nil? rhead) (str \"<code>\" (esc rref) \"</code> did not exist when this packet was built, so an ordinary push publishes it.\")\n+    (= rhead head) (str \"<code>\" (esc rref) \"</code> already holds it.\")\n+    :else (str \"Publishing it replaces <code>\" (esc rhead) \"</code> on <code>\" (esc rref) \"</code>, so you may also \"\n+               \"approve a force-push that replaces exactly that commit. Gatekeeper pushes with \"\n+               \"<code>--force-with-lease</code> and refuses if the remote has moved.\")))\n+\n+(defn break-section\n+  \"A review-chain break (PER-128): the last reviewed head is no longer in the\n+   branch, so no delta can be trusted. Says so before anything else, links the\n+   packet Ethan last acted on, and names every SHA the approval turns on.\"\n+  [packet]\n+  (when-let [{:keys [predecessor reviewed-head] why :reason/text :as b} (:chain-break packet)]\n+    (let [{:keys [base head] :as r} (:range packet)\n+          acted (first (filter #(= predecessor (:packet/id %)) (:history packet)))\n+          href (get *links* predecessor)\n+          row (fn [label v]\n+                (str \"<tr><th>\" label \"</th><td>\" (if v (str \"<code>\" (esc v) \"</code>\") \"<span class=\\\"hstate\\\">none</span>\")\n+                     \"</td></tr>\"))]\n+      (str \"<section class=\\\"break\\\" id=\\\"chain-break\\\">\"\n+           \"<h2>Review chain broken: no incremental diff</h2>\"\n+           \"<p>\" (esc why) \" The commits you reviewed in \"\n+           (if href\n+             (str \"<a class=\\\"plink\\\" href=\\\"\" (esc href) \"\\\">\" (esc predecessor) \"</a>\")\n+             (str \"<span class=\\\"pid\\\">\" (esc predecessor) \"</span> (expired)\"))\n+           (when acted (str \" (\" (response-html acted) \")\"))\n+           \" are not in this branch's history, so there is no trustworthy diff from them to this revision. \"\n+           \"This page shows the whole change instead: read it as a new review, not a follow-up.</p>\"\n+           \"<table class=\\\"shas\\\">\"\n+           (row \"last reviewed head\" reviewed-head)\n+           (row (str \"comparison base, \" (compared-with r)) base)\n+           (row \"current head\" head)\n+           (row (str \"remote head\" (when-let [rr (:remote/ref b)] (str \", \" (esc rr)))) (:remote/head b))\n+           \"</table>\"\n+           \"<p>Approving this packet approves exactly <code>\" (esc head) \"</code>. \" (break-remote b head) \"</p>\"\n+           \"</section>\"))))\n+\n (defn intro [packet]\n   (let [n (:narrative packet)]\n     (str \"<header class=\\\"lede\\\">\"\n",
+      "stats" : {
+        "added" : 44,
+        "removed" : 2
+      }
+    },
+    "h:b9a201e6" : {
+      "classification" : "code",
+      "diff/header" : "@@ -319,7 +319,7 @@",
+      "display/id" : "H-020",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/model.clj H1",
+      "lines" : {
+        "new" : {
+          "count" : 7,
+          "start" : 319
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 319
+        }
+      },
+      "patch" : "@@ -319,7 +319,7 @@\n    deciding whether the packet is right, and a shuffled one is a file nobody\n    can skim.\"\n   [:packet/id :packet/version :packet/created-at :packet/expires-at :packet/url\n-   :ticket/id :repo/path :range :chain :since-review :history :summary :narrative\n+   :ticket/id :repo/path :range :chain :since-review :chain-break :history :summary :narrative\n    :files :hunks :collapsed :tests :risks :gaps :warnings\n    :facts/digest :narrative/digest :comprehension :validation])\n \n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:e7744454" : {
+      "classification" : "code",
+      "diff/header" : "@@ -883,6 +926,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible{",
+      "display/id" : "H-026",
+      "file" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-packet/review_packet/render.clj H3",
+      "lines" : {
+        "new" : {
+          "count" : 13,
+          "start" : 926
+        },
+        "old" : {
+          "count" : 6,
+          "start" : 883
+        }
+      },
+      "patch" : "@@ -883,6 +926,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible{\n .since-files li{margin:0 0 .25rem}\n .banner{margin:.8rem 0;padding:.6rem .7rem;border:1px solid var(--rule);\n   border-left:3px solid var(--del);border-radius:4px;background:var(--raised)}\n+.break{margin:.8rem 0 1rem;padding:.6rem .7rem;border:1px solid var(--rule);\n+  border-left:3px solid var(--del);border-radius:4px;background:var(--raised)}\n+.break h2{margin:0 0 .4rem;color:var(--del)}\n+.break p{margin:0 0 .4rem}\n+.shas{border-collapse:collapse;margin:.2rem 0 .6rem;font-size:.9rem}\n+.shas th{text-align:left;font-weight:normal;color:var(--muted);padding:.1rem .8rem .1rem 0;vertical-align:top}\n+.shas td{overflow-wrap:anywhere}\n .full-cta{margin:.8rem 0;padding:.6rem .7rem;border:1px solid var(--rule);\n   border-left:3px solid var(--green);border-radius:4px;background:var(--raised)}\n .full-cta p{margin:0 0 .4rem}\n",
+      "stats" : {
+        "added" : 7,
+        "removed" : 0
+      }
+    },
+    "h:fb60a1a1" : {
+      "classification" : "code",
+      "diff/header" : "@@ -14,20 +14,33 @@",
+      "display/id" : "H-009",
+      "file" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "file/hunk-label" : "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H1",
+      "lines" : {
+        "new" : {
+          "count" : 33,
+          "start" : 14
+        },
+        "old" : {
+          "count" : 20,
+          "start" : 14
+        }
+      },
+      "patch" : "@@ -14,20 +14,33 @@\n   (:import (java.security SecureRandom)))\n \n (def never \"Never granted here, whatever you choose: force-push, review request, merge.\")\n+(def never-on-break \"Never granted here, whatever you choose: review request, merge, or a force-push over any other remote head.\")\n \n (defn- short-sha [s] (subs (str s) 0 (min 12 (count (str s)))))\n \n+(defn lease\n+  \"The remote head a force-push may replace (PER-128): only on a chain break,\n+   only the one the packet recorded, and never the head itself.\"\n+  [{:keys [chain_break remote_head head]}]\n+  (when (and chain_break remote_head (not= remote_head head)) remote_head))\n+\n (defn choices\n-  \"The only three decisions the page offers. PR implies push.\"\n-  [head]\n-  (let [h (short-sha head)\n-        approve (str \"Approves exactly \" h \" and ends pre-push review. \")]\n-    [{:delivery \"none\" :actions [] :label \"Approve the code only\"\n-      :consequence (str approve \"Nothing is pushed, and Gatekeeper is not queued.\")}\n-     {:delivery \"push\" :actions [\"push\"] :label \"Approve and push\"\n-      :consequence (str approve \"Gatekeeper will push \" h \" to the ticket's branch once this decision is durably recorded, and not before. No PR is opened.\")}\n-     {:delivery \"pr\" :actions [\"pr\" \"push\"] :label \"Approve, push and open a PR\"\n-      :consequence (str approve \"Gatekeeper will push \" h \" and open a PR once this decision is durably recorded, and not before. Opening a PR includes the push.\")}]))\n+  \"The decisions the page offers. PR implies push. A chain break whose\n+   remote holds another commit adds a force-push bound to that commit.\"\n+  ([head] (choices head nil))\n+  ([head facts]\n+   (let [h (short-sha head)\n+         approve (str \"Approves exactly \" h \" and ends pre-push review. \")\n+         l (lease facts)]\n+     (cond-> [{:delivery \"none\" :actions [] :label \"Approve the code only\"\n+               :consequence (str approve \"Nothing is pushed, and Gatekeeper is not queued.\")}\n+              {:delivery \"push\" :actions [\"push\"] :label \"Approve and push\"\n+               :consequence (str approve \"Gatekeeper will push \" h \" to the ticket's branch once this decision is durably recorded, and not before. No PR is opened.\")}\n+              {:delivery \"pr\" :actions [\"pr\" \"push\"] :label \"Approve, push and open a PR\"\n+               :consequence (str approve \"Gatekeeper will push \" h \" and open a PR once this decision is durably recorded, and not before. Opening a PR includes the push.\")}]\n+       l (conj {:delivery \"force-push\" :actions [\"force-push\"] :lease l :label \"Approve and force-push\"\n+                :consequence (str approve \"Gatekeeper will force-push \" h \" over \" (:remote_ref facts) \" with --force-with-lease, replacing exactly \"\n+                                  l \", and refuses if the remote is anywhere else. No PR is opened.\")})))))\n \n (defn dispatch\n   \"Where Gatekeeper stands for a decision, from kk-dispatch's derived job\n",
+      "stats" : {
+        "added" : 23,
+        "removed" : 10
+      }
+    },
+    "h:fdcada2c" : {
+      "classification" : "code",
+      "diff/header" : "@@ -370,7 +370,8 @@ status)",
+      "display/id" : "H-001",
+      "file" : "skills/engineering-manager/scripts/kk-approval.sh",
+      "file/hunk-label" : "skills/engineering-manager/scripts/kk-approval.sh H1",
+      "lines" : {
+        "new" : {
+          "count" : 8,
+          "start" : 370
+        },
+        "old" : {
+          "count" : 7,
+          "start" : 370
+        }
+      },
+      "patch" : "@@ -370,7 +370,8 @@ status)\n       pb=$(fq --arg p \"$p\" '$f.packets[$p].base' | jq -r .)\n       pd=$(digest_of \"$p\" \"$ph\" \"$pb\" || true)\n       facts=$(fq --arg p \"$p\" --arg d \"$pd\" '$f.packets[$p]\n-        | {head, base, base_ref, expires_at, delivered: (.ready != []), digest: (if $d == \"\" then null else $d end),\n+        | {head, base, base_ref, chain_break, remote_ref, remote_head, expires_at,\n+           delivered: (.ready != []), digest: (if $d == \"\" then null else $d end),\n            blocking_feedback: ([.feedback[] | select(.blocking)] | length), expired: ((.expires_at // \"\") <= $now)}')\n     fi\n     jq -c --arg t \"$ident\" --arg pol \"$KK_AP_POLICY\" --arg h \"$at_head\" --arg m \"$miss\" --argjson pf \"$facts\" \\\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 1
+      }
+    }
+  },
+  "narrative" : {
+    "context" : "Before any code leaves the machine, King Kong builds Ethan a review packet: a static page, `review.html`, holding the change, an essay about it, and buttons to approve it. `kk-review-packet build` collects the facts, `render` draws the page, and a small approval service records Ethan's decision in the ticket's history. Gatekeeper, a separate job, then pushes only what that decision allows. When a branch changes after Ethan reviewed it, the next packet is a follow-up that normally opens on the incremental diff: only what changed since the packet Ethan last acted on.",
+    "overview" : "The build [notices the rewrite and pins what origin holds](#noticing-the-break) as a fact every later step can only read. From that one record the page [puts the break in front of Ethan](#showing-the-break) with each commit named, while the [ticket's history log](#recording-the-break) carries the same fields to the service that grants pushes. Because the remote head arrives through that log rather than the browser, the [force-push choice](#approving-a-force-push) is bound to it twice: once in the service and again in the script that records the grant. The [approval panel](#approval-page) only displays the lease; it decides nothing.",
+    "problem" : "A rebase rewrites a branch's commits, so the head Ethan reviewed is no longer in the branch's history and no incremental diff can be computed. The build already fell back to showing the whole change, but the page said so in one muted line, \"No packet-to-packet diff: the branch was rebased\", with no commit SHAs and no clear link to the earlier review. A rebased branch already on origin can only be published by a force-push, which overwrites what origin holds, and the approval page could not grant one.",
+    "scope" : {
+      "in" : [ "The build records what origin held for the branch, and a `chain-break` fact when the reviewed head was rewritten away.", "A break section on `review.html`, before the title, in place of the old muted line.", "The break fields carried into the ticket's history and the approval service's packet facts.", "A fourth approval choice, \"Approve and force-push\", bound to the recorded remote head." ],
+      "out" : [ "Rebuilding a delta across the rewrite (range-diff, patch equivalence) is PER-129.", "Gatekeeper's refusal to force-push when origin has moved already exists (PER-102) and is unchanged.", "The hand-off's tests and its contract and approval docs are not in this commit.", "A base that moved without a rewrite (`base-moved`) is not treated as a break." ]
+    },
+    "sections" : [ {
+      "body" : [ {
+        "prose" : "A follow-up remembers the packet Ethan last acted on and the head it showed. The build already sorted a broken chain into reasons, and two of them mean history was rewritten: `not-descendant`, where the reviewed head is no longer an ancestor of the new head, and `predecessor-head-missing`, where it is gone from the repository."
+      }, {
+        "evidence" : [ "H-007", "H-017", "H-018", "H-019" ],
+        "explains" : "`kk-review-packet.sh` works out the branch name and, on a follow-up, passes `origin/<branch>` and the commit it pointed to when last fetched, without touching the network. `build.clj` accepts the two new flags and hands them to the model as `remote`, with the head left empty when origin has no such branch."
+      }, {
+        "evidence" : [ "H-022", "H-023" ],
+        "explains" : "`chain-break` is written only when there is an earlier reviewed packet and the chain reason is one of the two rewrites. It records the reason, the acted-on packet, its reviewed head, and the remote ref and head, so no later step has to work any of them out again."
+      }, {
+        "evidence" : [ "H-020", "H-021" ],
+        "explains" : "`chain-break` joins the packet's fixed key order and the list of fields the facts digest covers. The digest is the build's fingerprint of its facts, so neither the writer nor a later edit can change the break record unnoticed."
+      } ],
+      "contribution" : "Everything after depends on one fact the build now writes: that the reviewed history was rewritten, and which commit origin holds for the branch.",
+      "heading" : "The build notices a rewrite and records what origin holds",
+      "id" : "noticing-the-break",
+      "importance" : "core",
+      "transition" : {
+        "text" : "A recorded fact helps nobody until Ethan sees it, so the page reads it next.",
+        "to" : "showing-the-break"
+      }
+    }, {
+      "body" : [ {
+        "evidence" : [ "H-024" ],
+        "explains" : "`break-section` says why no diff exists, links the packet Ethan acted on with Ethan's response, and lists four full SHAs: last reviewed head, comparison base, current head, remote head. `break-remote` then says what approval can do: an ordinary push when origin has no branch, nothing extra when origin already holds the head, otherwise an optional force-push over exactly the recorded commit. The muted line is no longer printed on break packets."
+      }, {
+        "evidence" : [ "H-025", "H-026" ],
+        "explains" : "The section sits under the packet history and before the title, so it is read before the essay. Its styles reuse the red-edged banner look and let long SHAs wrap on a narrow phone screen."
+      } ],
+      "contribution" : "The old muted line becomes a section Ethan cannot miss, so a rebased packet never passes for an ordinary one.",
+      "heading" : "The page opens on the break, with every commit spelled out",
+      "id" : "showing-the-break",
+      "importance" : "core",
+      "transition" : {
+        "text" : "The approval service never reads the page; it reads the ticket's history, so the break must be recorded there too.",
+        "to" : "recording-the-break"
+      }
+    }, {
+      "body" : [ {
+        "evidence" : [ "H-006", "H-008", "H-001" ],
+        "explains" : "When a packet is built, `kk-packet.sh` copies `chain_break`, `remote_ref` and `remote_head` into the `built` event it logs. `kk_ap_fold`, which replays the log into one record per packet, keeps them, and `kk-approval status` returns them in `packet_facts`, the summary the approval service reads."
+      }, {
+        "evidence" : [ "H-005" ],
+        "explains" : "The brief sent to the summary writer now says a break packet is a fresh review of rewritten history, not a step from the earlier packet, so the essay Ethan reads agrees with the break section above it."
+      } ],
+      "contribution" : "The approval service decides from the ticket's history log, not the page, so the break fields must reach that log and be read back out of it.",
+      "heading" : "The ticket's history carries the break to the approval service",
+      "id" : "recording-the-break",
+      "importance" : "core",
+      "transition" : {
+        "text" : "With the remote head in `packet_facts`, approval can offer a force-push tied to it.",
+        "to" : "approving-a-force-push"
+      }
+    }, {
+      "body" : [ {
+        "prose" : "A force-push replaces whatever a remote branch points to. `--force-with-lease` is the guarded form: it names the commit the remote must still hold, called the lease, and refuses if it holds anything else. That guard is only as good as the lease, so here the packet fixes it, never the browser."
+      }, {
+        "evidence" : [ "H-009" ],
+        "explains" : "`lease` returns the recorded remote head only on a chain break where it differs from the head being approved. `choices` adds \"Approve and force-push\" only when such a lease exists, and its consequence text names the head, the remote ref and the exact commit it replaces."
+      }, {
+        "evidence" : [ "H-010", "H-011", "H-012", "H-013" ],
+        "explains" : "The lease is stored with the nonce, a one-time code the service issues with each page view, so on confirmation it comes from the server's copy and anything the browser sends is ignored. A force-push on a confirmation that offered none is refused with 409, and the lease is passed to `kk-packet-approval decide` only for a force-push."
+      }, {
+        "evidence" : [ "H-002", "H-003", "H-004" ],
+        "explains" : "`kk-packet-approval` takes an optional thirteenth argument, the lease, and refuses it for any other choice. For a force-push it asks `kk-approval status` and requires this to be the ticket's newest packet, a chain break, with the lease equal to the recorded remote head and different from the head. Only then does it grant `force-push` at that lease."
+      } ],
+      "contribution" : "Ethan can publish a rebased branch that is already on origin, and the push can overwrite only the commit the packet showed.",
+      "heading" : "A force-push can be approved, but only over the recorded commit",
+      "id" : "approving-a-force-push",
+      "importance" : "core"
+    }, {
+      "body" : [ {
+        "evidence" : [ "H-014", "H-015", "H-016" ],
+        "explains" : "The panel's facts list gains a chain-break row and the remote head with its ref, and a force-push confirmation adds a line naming the commit the remote must be at. The namespace description now lists the fourth choice."
+      } ],
+      "contribution" : "Ethan sees what a force-push would overwrite before confirming it, though this page code was never run in a browser.",
+      "heading" : "The approval panel shows the break, the remote head and the lease",
+      "id" : "approval-page",
+      "importance" : "supporting"
+    } ],
+    "thesis" : "A rebased follow-up now records a `chain-break` fact and opens with a section saying no incremental diff exists, linking the review it replaces and naming the four commits that matter. When origin holds a different commit, approval also offers a force-push that may replace only that recorded commit.",
+    "title" : "A rebased follow-up packet says so plainly and can approve a bound force-push"
+  },
+  "narrative/digest" : "sha256:5e83568b113ebf1e5e4acf471d63df4e6fdcbdd712011ba26bbe41077c32e5f3",
+  "packet/created-at" : "2026-11-01T00:00:00Z",
+  "packet/expires-at" : "2026-11-15T00:00:00Z",
+  "packet/id" : "p-20261101-88dfd0",
+  "packet/url" : "https://botserver.tail86a93e.ts.net/review/p-20261101-88dfd0/",
+  "packet/version" : 2,
+  "range" : {
+    "base" : "afb0c2207f395894798d34f1299440dc1e688f77",
+    "base/ref" : "701751b^",
+    "base/source" : "explicit",
+    "head" : "701751b2e7b8a2d1257acaea732776a71d5bbbe6",
+    "head/ref" : "701751b",
+    "merge-base?" : false
+  },
+  "repo/path" : "/home/multicad/multica_workspaces/personal-672708764437/per-172-a9dd976b619d/workdir/fx/repo",
+  "risks" : [ "`remote/head` is origin as last fetched, so a stale fetch gives a stale lease that Gatekeeper refuses, and Ethan must decide again.", "`packet_facts` gained three fields, so anything comparing that object exactly will break.", "A packet built from a bare commit rather than a branch name records no remote, so its page offers no force-push.", "The force-push grant relies on Gatekeeper's existing PER-102 check to refuse when origin has moved, which this commit does not touch." ],
+  "summary" : {
+    "stats" : {
+      "added" : 164,
+      "binary" : 0,
+      "by-classification" : {
+        "code" : 26
+      },
+      "files" : 10,
+      "hunks" : 26,
+      "removed" : 38,
+      "renamed" : 0
+    }
+  },
+  "tests" : [ {
+    "command" : "skills/engineering-manager/tests/run-tests.sh",
+    "note" : "Not run at this commit; at branch head 021a727 it gave 1542 passed and 8 failed, the same 8 that fail on main at afb0c22.",
+    "result" : "not-run"
+  }, {
+    "note" : "This diff adds no tests; the hand-off's twelve new checks are not in it.",
+    "result" : "not-run"
+  }, {
+    "command" : "shellcheck",
+    "note" : "Not on PATH here; the nix build enforces it.",
+    "result" : "not-run"
+  }, {
+    "note" : "The `approval.cljs` change was not exercised in a browser or by the Squint checks.",
+    "result" : "not-run"
+  } ],
+  "ticket/id" : "PER-128",
+  "validation" : {
+    "at" : "2026-11-03T12:50:36.626079440Z",
+    "contract/version" : 4,
+    "model/version" : 2,
+    "ok" : true,
+    "packet/id" : "p-20261101-88dfd0",
+    "validator/version" : 4,
+    "violations" : [ ]
+  },
+  "warnings" : [ {
+    "code" : "no-tests-run",
+    "message" : "Every test in this packet is not-run. The reader has only the diff."
+  }, {
+    "code" : "advisory-findings",
+    "message" : "The comprehension reader passed this with 3 suggestion(s): H-005 (the essay writer's brief) does not carry the break to the approval service. Either move it to showing-the-break, where it serves the same goal of making the page and essay agree, or open the section by saying it also covers the brief. The overview uses 'lease' before any section defines it. Gloss it there as 'the commit origin must still hold'. Say once what the 'review chain' is (the series of packets on one ticket, each following the last), in context before 'chain reason' and 'chain break' first appear. In the tests list, say what 'the Squint checks' are or drop the name."
+  } ]
+}

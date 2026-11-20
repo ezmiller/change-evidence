@@ -1,0 +1,101 @@
+{
+  "base": "afb0c2207f395894798d34f1299440dc1e688f77",
+  "head": "701751b2e7b8a2d1257acaea732776a71d5bbbe6",
+  "summary": {
+    "added": 6,
+    "deleted": 0,
+    "entitiesChanged": 27,
+    "filesChanged": 10,
+    "modified": 21,
+    "moved": 0,
+    "renamed": 0
+  },
+  "limits": "static reference graph only: calls the resolver cannot pin (dynamic dispatch, reflection, string-keyed lookup, callbacks registered at runtime) and non-code consumers are not modeled",
+  "noTestReaches": true,
+  "affectedTests": [],
+  "cone": {
+    "dependentFiles": [
+      "skills/engineering-manager/scripts/review-feedback/review_feedback/plugin.clj",
+      "skills/engineering-manager/scripts/review-feedback/review_feedback/repl.clj",
+      "skills/engineering-manager/scripts/review-feedback/review_feedback/routes.clj",
+      "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/ui.cljs",
+      "skills/engineering-manager/scripts/review-packet/render.clj",
+      "skills/engineering-manager/scripts/review-packet/review_packet/export.clj",
+      "skills/engineering-manager/scripts/review-packet/review_packet/validate.clj",
+      "skills/engineering-manager/scripts/review-packet/validate.clj"
+    ],
+    "filesOutsideCone": 174,
+    "filesWithStaticDependents": 8,
+    "sourceFiles": 188
+  },
+  "callerSetsAssessed": 10,
+  "callerSetsNotAssessed": 0,
+  "signatureChanges": [
+    {
+      "callers": [
+        {
+          "entity": "run",
+          "file": "skills/engineering-manager/scripts/review-packet/build.clj",
+          "kind": "calls",
+          "line": 121,
+          "test": false,
+          "touchedByChange": true,
+          "type": "function"
+        }
+      ],
+      "callersComplete": false,
+      "entity": "build-packet",
+      "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "incompleteBecause": [
+        {
+          "code": "value_refs",
+          "detail": "2 name used as a value (callback, registry, attribute access)"
+        }
+      ],
+      "line": 425,
+      "staleCallersOfOldName": [],
+      "type": "function"
+    }
+  ],
+  "untouchedCallers": [
+    {
+      "callers": [
+        {
+          "entity": "ordered",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "kind": "typeref",
+          "line": 326,
+          "test": false,
+          "touchedByChange": false,
+          "type": "function"
+        }
+      ],
+      "change": "modified",
+      "entity": "key-order",
+      "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "line": 309,
+      "stillExistsAtHead": true,
+      "type": "var"
+    },
+    {
+      "callers": [
+        {
+          "entity": "facts-digest",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "kind": "typeref",
+          "line": 375,
+          "test": false,
+          "touchedByChange": false,
+          "type": "function"
+        }
+      ],
+      "change": "modified",
+      "entity": "fact-keys",
+      "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "line": 343,
+      "stillExistsAtHead": true,
+      "type": "var"
+    }
+  ],
+  "_note": "sem 0.29.0 `sem certify 701751b~1..701751b --json`, excerpt"
+}

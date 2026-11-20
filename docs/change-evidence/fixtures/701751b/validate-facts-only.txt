@@ -1,0 +1,49 @@
+kk-review-packet: this packet has no narrative written into it yet. Every prose slot is still empty, so most of what follows is 'the writer has not run', not 'the writer got it wrong'.
+p-20261101-88dfd0  PER-128  INVALID — 45 violation(s)
+  [coverage] H-001: is not accounted for anywhere — skills/engineering-manager/scripts/kk-approval.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-002: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet-approval.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-003: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet-approval.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-004: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet-approval.sh H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-005: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-006: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-007: is not accounted for anywhere — skills/engineering-manager/scripts/kk-review-packet.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-008: is not accounted for anywhere — skills/engineering-manager/scripts/lib/kk-approval.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-009: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-010: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-011: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-012: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H4 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-013: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj H5 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-014: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-015: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-016: is not accounted for anywhere — skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-017: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/build.clj H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-018: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/build.clj H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-019: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/build.clj H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-020: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/model.clj H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-021: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/model.clj H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-022: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/model.clj H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-023: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/model.clj H4 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-024: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/render.clj H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-025: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/render.clj H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-026: is not accounted for anywhere — skills/engineering-manager/scripts/review-packet/review_packet/render.clj H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [required-fields] files[].role: is missing on files[0] skills/engineering-manager/scripts/kk-approval.sh
+  [required-fields] files[].role: is missing on files[1] skills/engineering-manager/scripts/kk-packet-approval.sh
+  [required-fields] files[].role: is missing on files[2] skills/engineering-manager/scripts/kk-packet.sh
+  [required-fields] files[].role: is missing on files[3] skills/engineering-manager/scripts/kk-review-packet.sh
+  [required-fields] files[].role: is missing on files[4] skills/engineering-manager/scripts/lib/kk-approval.sh
+  [required-fields] files[].role: is missing on files[5] skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj
+  [required-fields] files[].role: is missing on files[6] skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs
+  [required-fields] files[].role: is missing on files[7] skills/engineering-manager/scripts/review-packet/build.clj
+  [required-fields] files[].role: is missing on files[8] skills/engineering-manager/scripts/review-packet/review_packet/model.clj
+  [required-fields] files[].role: is missing on files[9] skills/engineering-manager/scripts/review-packet/review_packet/render.clj
+  [required-fields] narrative.context: is missing
+  [required-fields] narrative.overview: is missing
+  [required-fields] narrative.problem: is missing
+  [required-fields] narrative.scope.in: needs at least 1 entry, has 0
+  [required-fields] narrative.scope.out: needs at least 1 entry, has 0
+  [required-fields] narrative.sections: needs at least 1 entry, has 0
+  [required-fields] narrative.thesis: is missing
+  [required-fields] narrative.title: is missing
+  [required-fields] tests: needs at least 1 entry, has 0
+  warning: No risks are named. A change with none is rare enough to be worth saying. (no-risks)
+kk-review-packet: 45 violation(s) — nothing renders until they are fixed.

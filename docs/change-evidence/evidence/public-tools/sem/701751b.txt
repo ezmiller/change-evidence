@@ -1,0 +1,48 @@
+skills/engineering-manager/scripts/kk-approval.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-packet-approval.sh
+  M  orphan      module-level
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-packet.sh
+  M  function    send_brief
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-review-packet.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/lib/kk-approval.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj
+  A  var         never-on-break
+  A  function    lease
+  M  function    choices
+  M  function    view*
+  M  function    decide!
+
+skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs
+  M  orphan      module-level
+  M  function    facts
+  M  function    confirm-view
+
+skills/engineering-manager/scripts/review-packet/build.clj
+  M  var         flags
+  M  function    run
+
+skills/engineering-manager/scripts/review-packet/review_packet/model.clj
+  M  var         key-order
+  M  var         fact-keys
+  A  var         rewrites
+  A  function    chain-break
+  M  function    build-packet
+
+skills/engineering-manager/scripts/review-packet/review_packet/render.clj
+  M  function    since-section
+  A  function    break-remote
+  A  function    break-section
+  M  function    intro
+  M  var         css
+
+6 added, 21 modified across 10 files (7 modified orphans)

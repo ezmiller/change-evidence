@@ -1,0 +1,15 @@
+error: Entity ID 'skills/engineering-manager/scripts/kk-dispatch.sh::orphan::modified@L1-65' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-dispatch.sh::orphan::modified@L290-291' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-dispatch.sh::orphan::modified@L448-513' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-grant.sh::orphan::modified@L1-210' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-may.sh::orphan::modified@L227-427' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-packet.sh::orphan::modified@L844-865' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-restack.sh::orphan::modified@L1-164' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-restack.sh::orphan::modified@L167-318' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-restack.sh::orphan::modified@L323-532' not found
+error: Entity ID 'skills/engineering-manager/tests/run-tests.sh::orphan::modified@L2341-2515' not found
+error: Entity ID 'skills/engineering-manager/tests/run-tests.sh::orphan::modified@L2594-2624' not found
+error: Entity ID 'skills/engineering-manager/tests/run-tests.sh::orphan::modified@L2626-2654' not found
+error: Entity ID 'skills/engineering-manager/tests/run-tests.sh::orphan::modified@L2670-2707' not found
+error: Entity ID 'skills/engineering-manager/tests/run-tests.sh::orphan::modified@L2713-2821' not found
+sem impact --diff: 14 changed entities could not be analyzed in the working tree

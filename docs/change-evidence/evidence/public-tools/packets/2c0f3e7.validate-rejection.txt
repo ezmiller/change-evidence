@@ -1,0 +1,64 @@
+p-20261101-96b9b7  PER-173  INVALID — 61 violation(s)
+  [packet-id-matches] packet/id: the document is for packet nil, these facts are "p-20261101-96b9b7" — a document merged into the wrong packet describes a diff the reader is not looking at
+  [files-exact] agents/gatekeeper.md: is not a file in the facts
+  [files-exact] agents/personal/gatekeeper.md: is not a file in the facts
+  [files-exact] modules/kingkong-manager.nix: is not a file in the facts
+  [files-exact] skills/engineering-manager/SKILL.md: is not a file in the facts
+  [files-exact] skills/engineering-manager/references/exposure.md: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/kk-approval.sh: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/kk-may.sh: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/kk-packet-approval.sh: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/kk-packet-build.sh: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/review-feedback/review_feedback/notify.clj: is not a file in the facts
+  [files-exact] skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs: is not a file in the facts
+  [files-exact] skills/engineering-manager/tests/README.md: is not a file in the facts
+  [files-exact] skills/engineering-manager/tests/fake-multica.sh: is not a file in the facts
+  [files-exact] skills/engineering-manager/tests/run-tests.sh: is not a file in the facts
+  [hunks-exist] collapsed[1] mechanical: groups "H-019", which is not a hunk in this packet
+  [hunks-exist] collapsed[1] mechanical: groups "H-020", which is not a hunk in this packet
+  [hunks-exist] collapsed[1] mechanical: groups "H-021", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[0] import-pins-the-pr body[1]: cites "H-003", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[0] import-pins-the-pr body[1]: cites "H-022", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[0] import-pins-the-pr body[1]: cites "H-023", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[0] import-pins-the-pr body[2]: cites "H-999", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[1] brief-or-mark-stale body[0]: cites "H-028", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[0]: cites "H-024", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[0]: cites "H-030", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[2]: cites "H-013", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[2]: cites "H-014", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[2]: cites "H-015", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[3]: cites "H-031", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[2] build-at-the-pinned-head body[3]: cites "H-032", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[0]: cites "H-006", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[1]: cites "H-033", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[1]: cites "H-034", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[1]: cites "H-035", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[2]: cites "H-037", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[3]: cites "H-036", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[3]: cites "H-038", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[4]: cites "H-039", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[3] page-records-only body[4]: cites "H-040", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[0]: cites "H-009", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[0]: cites "H-010", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[0]: cites "H-011", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[0]: cites "H-012", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[1]: cites "H-007", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[1]: cites "H-008", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[4] every-gate-refuses body[2]: cites "H-027", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[5] what-ethan-reads body[0]: cites "H-025", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[5] what-ethan-reads body[0]: cites "H-026", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[5] what-ethan-reads body[0]: cites "H-029", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[0]: cites "H-016", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[0]: cites "H-017", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[0]: cites "H-018", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[1]: cites "H-004", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[1]: cites "H-005", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[6] docs body[1]: cites "H-041", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[7] tests body[0]: cites "H-044", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[7] tests body[1]: cites "H-045", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[7] tests body[2]: cites "H-042", which is not a hunk in this packet
+  [hunks-exist] narrative.sections[7] tests body[2]: cites "H-043", which is not a hunk in this packet
+  [limits] narrative.sections[0] import-pins-the-pr body[2]: 42 chars, floor 60 — short by 18
+  warning: 2 of 2 hunks are collapsed; most of this diff reaches the reader folded. (mostly-collapsed)
+kk-review-packet: 61 violation(s) — nothing renders until they are fixed.

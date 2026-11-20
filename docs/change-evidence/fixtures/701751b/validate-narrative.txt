@@ -1,0 +1,2 @@
+p-20261101-88dfd0  PER-128  NARRATIVE VALID — 1 warning(s)
+  warning: Every test in this packet is not-run. The reader has only the diff. (no-tests-run)

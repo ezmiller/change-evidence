@@ -1,0 +1,50 @@
+{
+  "packet/id": "p-20261101-88dfd0",
+  "narrative/digest": "sha256:5e83568b113ebf1e5e4acf471d63df4e6fdcbdd712011ba26bbe41077c32e5f3",
+  "verdict": "pass",
+  "understanding": {
+    "system": "A pre-push review pipeline: before code leaves the machine, a tool builds Ethan a static review page for the change, a small approval service records what Ethan decides in the ticket's history log, and a separate job (Gatekeeper) then pushes only what that decision permits. When a branch changes after a review, the next page is normally a follow-up showing only what changed since the reviewed commit.",
+    "problem": "After a rebase the reviewed commit is no longer in the branch, so no 'what changed since' diff exists. The page fell back to the whole change but said so in one faint line, with no commit hashes and no clear link to the earlier review. And because a rebased branch already on origin can only be published by overwriting it, while approval could not grant a force-push, such a branch could not be published through approval at all.",
+    "approach": "Detect the rewrite once, at build time, and record it with the commit origin holds as a fixed fact covered by the packet's fingerprint. Then make every later step read that one record: the page shows it prominently, the history log carries it to the approval service, and approval may offer a force-push that can overwrite only that recorded origin commit.",
+    "sections": [
+      {
+        "id": "noticing-the-break",
+        "advances": "The build script looks up origin's last-fetched commit for the branch and passes it in; the model writes a chain-break record only when the earlier review's commit was rewritten away (not an ancestor, or gone), and the fingerprint covers it so it cannot be changed later."
+      },
+      {
+        "id": "showing-the-break",
+        "advances": "The page opens, above the title, with a red-edged section that says why there is no diff, links the earlier review, lists the four commits that matter, and says what approval can do about origin; the old faint line is dropped for these packets."
+      },
+      {
+        "id": "recording-the-break",
+        "advances": "Because the approval service reads the ticket's log, not the page, the break fields are written into the log's build entry, kept when the log is replayed, and returned in the status summary the service reads. The essay writer is also told to treat the packet as a fresh review."
+      },
+      {
+        "id": "approving-a-force-push",
+        "advances": "A fourth choice, approve and force-push, appears only on a break where origin holds a different commit. The commit it may overwrite (the lease) is held on the server with the one-time confirmation code, never taken from the browser, and the recording script checks it again against the log before granting."
+      }
+    ],
+    "reading-order": "Each step consumes the previous one's output: the build creates the fact; the page shows it to Ethan; the log carries it to the service that cannot see the page; only then can the service offer a force-push bound to it. The panel display comes last because it only shows what the service decided.",
+    "peripheral": "The approval panel changes (extra rows and a lease line) are display only and decide nothing. The page's CSS is styling. The brief to the essay writer keeps the essay consistent with the break section.",
+    "risks": "The origin commit is whatever was last fetched, so a stale fetch yields a lease Gatekeeper will refuse, and Ethan must decide again. Three new fields in the status summary may break exact comparisons. Packets built from a bare commit record no remote and offer no force-push. Safety relies on Gatekeeper's existing refusal when origin has moved. Nothing was run: no tests in this commit, the suite not run here, shellcheck not run, and the panel never opened in a browser.",
+    "in-plain-words": "When someone rewrites a branch after it was reviewed, the review tool used to mention it in a faint line and offered no way to publish the result. Now it detects the rewrite, records which commit the server copy of the branch points to, and opens the review page with a clear warning that lists the relevant commits. Approval can also allow an overwrite of the server's branch, but only if the branch still points to the commit that was recorded. That condition is checked on the server twice, and the push tool refuses if anything has moved."
+  },
+  "findings": [
+    {
+      "criterion": "sections",
+      "severity": "advisory",
+      "section": "recording-the-break",
+      "request": "H-005 (the essay writer's brief) does not carry the break to the approval service. Either move it to showing-the-break, where it serves the same goal of making the page and essay agree, or open the section by saying it also covers the brief."
+    },
+    {
+      "criterion": "overview",
+      "severity": "advisory",
+      "request": "The overview uses 'lease' before any section defines it. Gloss it there as 'the commit origin must still hold'."
+    },
+    {
+      "criterion": "language",
+      "severity": "advisory",
+      "request": "Say once what the 'review chain' is (the series of packets on one ticket, each following the last), in context before 'chain reason' and 'chain break' first appear. In the tests list, say what 'the Squint checks' are or drop the name."
+    }
+  ]
+}

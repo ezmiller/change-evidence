@@ -1,0 +1,8 @@
+error: Entity ID 'skills/engineering-manager/scripts/kk-approval.sh::orphan::modified@L356-527' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-packet-approval.sh::orphan::modified@L1-23' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-packet-approval.sh::orphan::modified@L27-104' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-packet.sh::orphan::modified@L925-1083' not found
+error: Entity ID 'skills/engineering-manager/scripts/kk-review-packet.sh::orphan::modified@L389-523' not found
+error: Entity ID 'skills/engineering-manager/scripts/lib/kk-approval.sh::orphan::modified@L1-192' not found
+error: Entity ID 'skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs::orphan::modified@L1-7' not found
+sem impact --diff: 7 changed entities could not be analyzed in the working tree

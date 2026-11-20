@@ -1,0 +1,40 @@
+[
+  {
+    "issue_id": "01a1a173-0687-7654-bfa1-2814536bc235",
+    "agent_id": "606d4ef0-6a24-4c2f-b27d-26b877aba394",
+    "run_id": "01a1a173-069b-7d72-bcac-534fd0f294d2",
+    "started_at": "2026-11-03T12:47:12Z",
+    "completed_at": "2026-11-03T12:49:20Z",
+    "usage": [
+      {
+        "cache_read_tokens": 544804,
+        "cache_write_tokens": 72256,
+        "input_tokens": 20,
+        "model": "claude-opus-5-5[1m]",
+        "output_tokens": 13897,
+        "provider": "claude"
+      }
+    ],
+    "role": "Change Summary Writer",
+    "ticket": "PER-184"
+  },
+  {
+    "issue_id": "01a1a175-322b-75d5-a5cd-c04bcf2b6464",
+    "agent_id": "8412b528-1261-4d1d-8e7b-9b0b3c9c8be0",
+    "run_id": "01a1a175-323b-76e2-9973-95376a9d5df3",
+    "started_at": "2026-11-03T12:49:34Z",
+    "completed_at": "2026-11-03T12:50:27Z",
+    "usage": [
+      {
+        "cache_read_tokens": 317801,
+        "cache_write_tokens": 57286,
+        "input_tokens": 16,
+        "model": "claude-opus-5-5[1m]",
+        "output_tokens": 4760,
+        "provider": "claude"
+      }
+    ],
+    "role": "Packet Reader",
+    "ticket": "PER-185"
+  }
+]

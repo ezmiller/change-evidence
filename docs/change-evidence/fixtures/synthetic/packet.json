@@ -1,0 +1,166 @@
+{
+  "chain" : {
+    "links" : [ ],
+    "mode" : "full",
+    "predecessor" : null,
+    "reason" : "first",
+    "reason/text" : "No earlier packet on this ticket was reviewed, so this packet covers the whole change."
+  },
+  "collapsed" : [ ],
+  "facts/digest" : "sha256:01ce787e84fa9e2f50cdadb4c8732d14f6797a5f904d5ac35153326de3613ed1",
+  "files" : [ {
+    "binary?" : false,
+    "hunks" : [ "h:50a1e315" ],
+    "path" : "empty.txt",
+    "role" : null,
+    "stats" : {
+      "added" : 0,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "added"
+  }, {
+    "binary?" : true,
+    "hunks" : [ "h:993ed0f9" ],
+    "path" : "logo.png",
+    "role" : null,
+    "stats" : {
+      "added" : 0,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:eb466354" ],
+    "path" : "renamed.txt",
+    "path/from" : "old.txt",
+    "role" : null,
+    "similarity" : 100,
+    "stats" : {
+      "added" : 0,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "renamed"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:b7a56849" ],
+    "mode" : {
+      "from" : "100644",
+      "to" : "100755"
+    },
+    "path" : "tool.sh",
+    "role" : null,
+    "stats" : {
+      "added" : 0,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "modified"
+  } ],
+  "gaps" : [ ],
+  "hunks" : {
+    "h:50a1e315" : {
+      "classification" : "code",
+      "diff/header" : null,
+      "display/id" : "H-001",
+      "file" : "empty.txt",
+      "file/hunk-label" : "empty.txt H1",
+      "hunk/synthetic?" : true,
+      "patch" : "new file mode 100644\n",
+      "stats" : {
+        "added" : 0,
+        "removed" : 0
+      }
+    },
+    "h:993ed0f9" : {
+      "classification" : "binary",
+      "diff/header" : null,
+      "display/id" : "H-002",
+      "file" : "logo.png",
+      "file/hunk-label" : "logo.png H1",
+      "hunk/synthetic?" : true,
+      "patch" : "Binary files a/logo.png and b/logo.png differ\n",
+      "stats" : {
+        "added" : 0,
+        "removed" : 0
+      }
+    },
+    "h:b7a56849" : {
+      "classification" : "mode-change",
+      "diff/header" : null,
+      "display/id" : "H-004",
+      "file" : "tool.sh",
+      "file/hunk-label" : "tool.sh H1",
+      "hunk/synthetic?" : true,
+      "patch" : "old mode 100644\nnew mode 100755\n",
+      "stats" : {
+        "added" : 0,
+        "removed" : 0
+      }
+    },
+    "h:eb466354" : {
+      "classification" : "rename",
+      "diff/header" : null,
+      "display/id" : "H-003",
+      "file" : "renamed.txt",
+      "file/hunk-label" : "renamed.txt H1",
+      "hunk/synthetic?" : true,
+      "patch" : "similarity index 100%\nrename from old.txt\nrename to renamed.txt\n",
+      "stats" : {
+        "added" : 0,
+        "removed" : 0
+      }
+    }
+  },
+  "narrative" : {
+    "context" : null,
+    "overview" : null,
+    "problem" : null,
+    "scope" : {
+      "in" : [ ],
+      "out" : [ ]
+    },
+    "sections" : [ ],
+    "thesis" : null,
+    "title" : null
+  },
+  "packet/created-at" : "2026-11-04T00:00:00Z",
+  "packet/expires-at" : "2026-11-18T00:00:00Z",
+  "packet/id" : "p-20261104-8b9ed0",
+  "packet/url" : "https://botserver.tail86a93e.ts.net/review/p-20261104-8b9ed0/",
+  "packet/version" : 2,
+  "range" : {
+    "base" : "3cb69ef0ab1accb65db450feb9ec1ce317bf6a9f",
+    "base/ref" : "HEAD~1",
+    "base/source" : "explicit",
+    "head" : "5b8bd66d82b86a206eb209930094ca8f52f7a490",
+    "head/ref" : "HEAD",
+    "merge-base?" : false
+  },
+  "repo/path" : "/home/multicad/multica_workspaces/personal-672708764437/per-175-634828ba1a75/workdir/synth.gB3m/repo",
+  "risks" : [ ],
+  "summary" : {
+    "stats" : {
+      "added" : 0,
+      "binary" : 1,
+      "by-classification" : {
+        "binary" : 1,
+        "code" : 1,
+        "mode-change" : 1,
+        "rename" : 1
+      },
+      "files" : 4,
+      "hunks" : 4,
+      "removed" : 0,
+      "renamed" : 1
+    }
+  },
+  "tests" : [ ],
+  "ticket/id" : "PER-175",
+  "warnings" : [ {
+    "code" : "binary-files",
+    "message" : "1 binary file(s) cannot be shown as a diff; each is one hunk recording that it changed."
+  } ]
+}

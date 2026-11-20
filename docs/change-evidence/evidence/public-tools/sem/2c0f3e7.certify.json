@@ -1,0 +1,66 @@
+{
+  "affectedTests": [],
+  "base": "5c41816df66092c69cebc8401a6fdd3d0c3f8a18",
+  "calleeDeltas": [],
+  "callerSetsAssessed": 0,
+  "callerSetsIncomplete": [],
+  "callerSetsNotAssessed": 0,
+  "cone": {
+    "dependentFiles": [],
+    "filesOutsideCone": 197,
+    "filesWithStaticDependents": 0,
+    "sourceFiles": 198
+  },
+  "entities": [
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-packet.sh",
+      "lines": [
+        283,
+        341
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    },
+    {
+      "change": "modified",
+      "file": "skills/engineering-manager/scripts/kk-packet.sh",
+      "lines": [
+        905,
+        976
+      ],
+      "name": "module-level",
+      "oldFile": null,
+      "oldName": null,
+      "type": "orphan"
+    }
+  ],
+  "head": "2c0f3e741bce2b060e266252e6ecdd0dce377af7",
+  "laws": {
+    "results": [],
+    "sources": []
+  },
+  "limits": "static reference graph only: calls the resolver cannot pin (dynamic dispatch, reflection, string-keyed lookup, callbacks registered at runtime) and non-code consumers are not modeled",
+  "moduleReachability": {
+    "changedModules": [],
+    "edgesAdded": [],
+    "edgesRemoved": [],
+    "modules": 5,
+    "modulesWithGrownReach": 0,
+    "newlyReachedTargets": []
+  },
+  "noTestReaches": true,
+  "signatureChanges": [],
+  "summary": {
+    "added": 0,
+    "deleted": 0,
+    "entitiesChanged": 2,
+    "filesChanged": 1,
+    "modified": 2,
+    "moved": 0,
+    "renamed": 0
+  },
+  "untouchedCallers": []
+}

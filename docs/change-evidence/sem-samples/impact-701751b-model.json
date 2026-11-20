@@ -1,0 +1,455 @@
+[
+  {
+    "callersComplete": false,
+    "checked": "every code mention of `chain-break` in 6 file(s) (comments and docstrings excluded), aliases one hop, dispatch/registration decorators, getattr with a literal prefix; a name computed entirely at runtime is not modeled",
+    "dependencies": [
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::rewrites",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          411,
+          413
+        ],
+        "name": "rewrites",
+        "type": "var"
+      }
+    ],
+    "dependents": [
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::build-packet",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          425,
+          508
+        ],
+        "name": "build-packet",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::fact-keys",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          343,
+          349
+        ],
+        "name": "fact-keys",
+        "type": "var"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::key-order",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          309,
+          324
+        ],
+        "name": "key-order",
+        "type": "var"
+      }
+    ],
+    "entity": {
+      "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::chain-break",
+      "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "lines": [
+        415,
+        423
+      ],
+      "name": "chain-break",
+      "type": "function"
+    },
+    "impact": {
+      "depth": 2,
+      "entities": [
+        {
+          "depth": 1,
+          "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::build-packet",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "lines": [
+            425,
+            508
+          ],
+          "name": "build-packet",
+          "type": "function"
+        },
+        {
+          "depth": 1,
+          "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::fact-keys",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "lines": [
+            343,
+            349
+          ],
+          "name": "fact-keys",
+          "type": "var"
+        },
+        {
+          "depth": 1,
+          "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::key-order",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "lines": [
+            309,
+            324
+          ],
+          "name": "key-order",
+          "type": "var"
+        },
+        {
+          "depth": 2,
+          "entityId": "skills/engineering-manager/scripts/review-packet/build.clj::function::run",
+          "file": "skills/engineering-manager/scripts/review-packet/build.clj",
+          "lines": [
+            121,
+            179
+          ],
+          "name": "run",
+          "type": "function"
+        },
+        {
+          "depth": 2,
+          "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::facts-digest",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "lines": [
+            375,
+            383
+          ],
+          "name": "facts-digest",
+          "type": "function"
+        },
+        {
+          "depth": 2,
+          "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::ordered",
+          "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+          "lines": [
+            326,
+            341
+          ],
+          "name": "ordered",
+          "type": "function"
+        }
+      ],
+      "total": 6
+    },
+    "incompleteBecause": [
+      {
+        "code": "unresolved_calls",
+        "detail": "1 call by bare name not bound by the resolver (alias, import or scope)"
+      },
+      {
+        "code": "string_keys",
+        "detail": "2 string literal equal to the name (getattr, registry or dispatch table)"
+      },
+      {
+        "code": "value_refs",
+        "detail": "4 name used as a value (callback, registry, attribute access)"
+      }
+    ],
+    "noTestReaches": true,
+    "possibleCallers": [
+      {
+        "entity": "view*",
+        "file": "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+        "sites": [
+          {
+            "kind": "call",
+            "line": 144
+          }
+        ],
+        "start_line": 132,
+        "type": "function"
+      },
+      {
+        "entity": "<module level>",
+        "file": "skills/engineering-manager/scripts/kk-packet.sh",
+        "sites": [
+          {
+            "kind": "string_key",
+            "line": 1023
+          }
+        ],
+        "start_line": 0,
+        "type": "module"
+      },
+      {
+        "entity": "send_brief",
+        "file": "skills/engineering-manager/scripts/kk-packet.sh",
+        "sites": [
+          {
+            "kind": "string_key",
+            "line": 662
+          }
+        ],
+        "start_line": 646,
+        "type": "function"
+      },
+      {
+        "entity": "since-section",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+        "sites": [
+          {
+            "kind": "value_ref",
+            "line": 467
+          }
+        ],
+        "start_line": 445,
+        "type": "function"
+      },
+      {
+        "entity": "break-section",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+        "sites": [
+          {
+            "kind": "value_ref",
+            "line": 489
+          },
+          {
+            "kind": "value_ref",
+            "line": 496
+          }
+        ],
+        "start_line": 484,
+        "type": "function"
+      },
+      {
+        "entity": "facts",
+        "file": "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+        "sites": [
+          {
+            "kind": "value_ref",
+            "line": 102
+          }
+        ],
+        "start_line": 95,
+        "type": "function"
+      }
+    ],
+    "tests": []
+  },
+  {
+    "callersComplete": false,
+    "checked": "every code mention of `build-packet` in 2 file(s) (comments and docstrings excluded), aliases one hop, dispatch/registration decorators, getattr with a literal prefix; a name computed entirely at runtime is not modeled",
+    "dependencies": [
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::assign-ids",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          273,
+          286
+        ],
+        "name": "assign-ids",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::assoc-array",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          394,
+          397
+        ],
+        "name": "assoc-array",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::at-utc",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          270,
+          271
+        ],
+        "name": "at-utc",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::build-file",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          208,
+          263
+        ],
+        "name": "build-file",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::chain-break",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          415,
+          423
+        ],
+        "name": "chain-break",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::digest",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          365,
+          366
+        ],
+        "name": "digest",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::facts-digest",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          375,
+          383
+        ],
+        "name": "facts-digest",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::label-per-file",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          288,
+          295
+        ],
+        "name": "label-per-file",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::sha256-hex",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          81,
+          84
+        ],
+        "name": "sha256-hex",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::since-facts",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          399,
+          409
+        ],
+        "name": "since-facts",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::warnings-for",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          297,
+          307
+        ],
+        "name": "warnings-for",
+        "type": "function"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::empty-narrative",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          385,
+          392
+        ],
+        "name": "empty-narrative",
+        "type": "var"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::iso",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          267,
+          267
+        ],
+        "name": "iso",
+        "type": "var"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::model-version",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          33,
+          33
+        ],
+        "name": "model-version",
+        "type": "var"
+      },
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::var::yyyymmdd",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "lines": [
+          268,
+          268
+        ],
+        "name": "yyyymmdd",
+        "type": "var"
+      }
+    ],
+    "dependents": [
+      {
+        "entityId": "skills/engineering-manager/scripts/review-packet/build.clj::function::run",
+        "file": "skills/engineering-manager/scripts/review-packet/build.clj",
+        "lines": [
+          121,
+          179
+        ],
+        "name": "run",
+        "type": "function"
+      }
+    ],
+    "entity": {
+      "entityId": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj::function::build-packet",
+      "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "lines": [
+        425,
+        508
+      ],
+      "name": "build-packet",
+      "type": "function"
+    },
+    "impact": {
+      "depth": 2,
+      "entities": [
+        {
+          "depth": 1,
+          "entityId": "skills/engineering-manager/scripts/review-packet/build.clj::function::run",
+          "file": "skills/engineering-manager/scripts/review-packet/build.clj",
+          "lines": [
+            121,
+            179
+          ],
+          "name": "run",
+          "type": "function"
+        }
+      ],
+      "total": 1
+    },
+    "incompleteBecause": [
+      {
+        "code": "value_refs",
+        "detail": "2 name used as a value (callback, registry, attribute access)"
+      }
+    ],
+    "noTestReaches": true,
+    "possibleCallers": [
+      {
+        "entity": "key-order",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "sites": [
+          {
+            "kind": "value_ref",
+            "line": 310
+          }
+        ],
+        "start_line": 309,
+        "type": "var"
+      },
+      {
+        "entity": "ordered",
+        "file": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+        "sites": [
+          {
+            "kind": "value_ref",
+            "line": 328
+          }
+        ],
+        "start_line": 326,
+        "type": "function"
+      }
+    ],
+    "tests": []
+  }
+]

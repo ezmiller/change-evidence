@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "change_set": {
+    "kind": "commit",
+    "ref": "701751b2",
+    "head_sha": "701751b2e7b8a2d1257acaea732776a71d5bbbe6",
+    "base_sha": "afb0c2207f395894798d34f1299440dc1e688f77",
+    "title": "feat(review-packet): treat a rebased follow-up as an explicit review-chain break (PER-128)",
+    "description": "Co-authored-by: multica-agent <[EMAIL_1]>",
+    "authors": [
+      "Ethan Miller <ethanzanemiller@gmail.com>"
+    ],
+    "date": "2026-10-21T17:01:16-04:00",
+    "commits": [
+      {
+        "short_hash": "701751b2",
+        "subject": "feat(review-packet): treat a rebased follow-up as an explicit review-chain break (PER-128)",
+        "author": "Ethan Miller <ethanzanemiller@gmail.com>"
+      }
+    ]
+  },
+  "files_changed": [
+    {
+      "path": "skills/engineering-manager/scripts/kk-approval.sh",
+      "change_type": "modified",
+      "additions": 2,
+      "deletions": 1,
+      "diff_content": "@@ -370,7 +370,8 @@ status)\n       pb=$(fq --arg p \"$p\" '$f.packets[$p].base' | jq -r .)\n       pd=$(digest_of \"$p\" \"$ph\" \"$pb\" || true)\n       facts=$(fq --arg p \"$p\" --arg d \"$pd\" '$f.packets[$p]\n-        | {head, base, base_ref, expires_at, delivered: (.ready != []), digest: (if $d == \"\" then null else $d end),\n+        | {head, base, base_ref, chain_break, remote_ref, remote_head, expires_at,\n+           delivered: (.ready != []), digest: (if $d == \"\" then null else $d end),\n            blocking_feedback: ([.feedback[] | select(.blocking)] | length), expired: ((.expires_at // \"\") <= $now)}')\n     fi\n     jq -c --arg t \"$ident\" --arg pol \"$KK_AP_POLICY\" --arg h \"$at_head\" --arg m \"$miss\" --argjson pf \"$facts\" \\\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "change_type": "modified",
+      "additions": 19,
+      "deletions": 6,
+      "diff_content": "@@ -2,12 +2,15 @@\n # for the approval controls on a packet's page:\n #\n #   kk-packet-approval status <packet-id>\n-#   kk-packet-approval decide <packet-id> <none|push|pr> <actor> <device>\n+#   kk-packet-approval decide <packet-id> <none|push|pr|force-push> <actor> <device>\n #                      <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|->\n+#                      [<lease>]\n #   kk-packet-approval dispatch <packet-id>\n #\n # The ticket comes from the route kk-packet recorded. The only grants it can\n-# make are push, and pr with push; never force-push, review-request or merge.\n+# make are push, pr with push, and on a review-chain break (PER-128) a\n+# force-push whose lease is the remote head the packet recorded; never\n+# review-request or merge.\n # status adds kk-dispatch's status as `publication`; dispatch hands a pending\n # Gatekeeper job over (PER-83), after arming a kk-watch in the packet's session\n # (PER-95). KKPA_* are prepended by modules/kingkong-manager.nix.\n@@ -24,8 +27,8 @@ fail() { echo \"kk-packet-approval: $1\" >&2; exit 12; }\n cmd=${1:-}\n pid=${2:-}\n case \"$cmd:$#\" in\n-  status:2|dispatch:2|decide:12) ;;\n-  *) fail \"usage: kk-packet-approval status <packet-id> | dispatch <packet-id> | decide <packet-id> <none|push|pr> <actor> <device> <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|->\" ;;\n+  status:2|dispatch:2|decide:12|decide:13) ;;\n+  *) fail \"usage: kk-packet-approval status <packet-id> | dispatch <packet-id> | decide <packet-id> <none|push|pr|force-push> <actor> <device> <digest> <head> <base> <policy> <revision|-> <feedback-seen> <supersede|-> [<lease>]\" ;;\n esac\n printf '%s' \"$pid\" | grep -qE '^p-[0-9]{8}-[0-9a-f]{4,64}$' || fail \"'$pid' is not a packet id\"\n \n@@ -73,12 +76,22 @@ if [ \"$cmd\" = dispatch ]; then\n   exit \"$rc\"\n fi\n \n-delivery=$3 actor=$4 device=$5 digest=$6 head=$7 base=$8 policy=$9 revision=${10} seen=${11} supersede=${12}\n+delivery=$3 actor=$4 device=$5 digest=$6 head=$7 base=$8 policy=$9 revision=${10} seen=${11} supersede=${12} lease=${13:-}\n+[ -z \"$lease\" ] || [ \"$delivery\" = force-push ] || fail \"a lease is for force-push only\"\n case \"$delivery\" in\n   none) actions=() ;;\n   push) actions=(--action push) ;;\n   pr) actions=(--action push --action pr) ;;\n-  *) fail \"'$delivery' is not a delivery choice: none, push or pr\" ;;\n+  force-push)\n+    # Only the remote head this packet recorded on a chain break, and only while\n+    # it is still this ticket's newest packet: kk-approval decides the rest.\n+    facts=$(kk-approval status \"$ticket\" --output json \"${ws[@]+\"${ws[@]}\"}\") || exit $?\n+    jq -e --arg p \"$pid\" --arg l \"$lease\" --arg h \"$head\" \\\n+       '.packet == $p and .packet_facts.chain_break != null and .packet_facts.remote_head == $l and $l != $h' \\\n+       <<< \"$facts\" >/dev/null \\\n+      || fail \"force-push needs a chain-break packet and, as its lease, the remote head that packet recorded\"\n+    actions=(--action force-push --lease \"$lease\") ;;\n+  *) fail \"'$delivery' is not a delivery choice: none, push, pr or force-push\" ;;\n esac\n printf '%s' \"$device\" | grep -qE '^[a-z0-9][a-z0-9-]{0,62}$' || fail \"'$device' is not a device name\"\n printf '%s' \"$digest\" | grep -qE '^sha256:[0-9a-f]{64}$' || fail \"'$digest' is not a packet digest\"\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "change_type": "modified",
+      "additions": 4,
+      "deletions": 1,
+      "diff_content": "@@ -659,6 +659,7 @@ send_brief() {\n   [ ! -s \"$sd/violations.txt\" ] || violations=$(cat \"$sd/violations.txt\")\n   follows=$(jq -r '(if .chain.mode == \"incremental\" then\n       \"Follow-up to packet \\(.chain.predecessor) (\\(.chain.links[-1].\"packet/url\")). This packet still holds the whole change against \\(.range.\"base/ref\"): argue all of it.\"\n+    elif .\"chain-break\" then \"Review chain break: \\(.\"chain\".\"reason/text\") There is no diff from \\(.\"chain-break\".predecessor), the last packet Ethan acted on, to this revision. Write about the whole change, and say in narrative.since that it is a fresh review of a rewritten history, not a step from \\(.\"chain-break\".predecessor).\"\n     elif (.chain.reason // \"first\") != \"first\" then \"Full packet: \\(.\"chain\".\"reason/text\") Write about the whole change.\"\n     else empty end),\n     (.\"since-review\" // empty\n@@ -1018,7 +1019,9 @@ ERR\n       base: .range.base, head: .range.head, since: .chain.since,\n       base_ref: .range.\"base/ref\", base_source: .range.\"base/source\", predecessor: .chain.predecessor,\n       mode: .chain.mode, reason: .chain.reason, created_at: .\"packet/created-at\",\n-      url: .\"packet/url\", expires_at: .\"packet/expires-at\", key: $k, trigger: $t, at: $at}' \\\n+      url: .\"packet/url\", expires_at: .\"packet/expires-at\", key: $k, trigger: $t, at: $at}\n+      + (.\"chain-break\" // null | if . then {chain_break: .reason, remote_ref: .\"remote/ref\",\n+                                             remote_head: .\"remote/head\"} else {} end)' \\\n       \"$bundle/packet.json\")\"\n   rm -f \"$sd/pending.json\"\n \n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-review-packet.sh",
+      "change_type": "modified",
+      "additions": 14,
+      "deletions": 0,
+      "diff_content": "@@ -462,7 +462,21 @@ if [ -n \"$predecessor\" ]; then\n     since_status=\"not-descendant\"\n   fi\n fi\n+# PER-128: what origin held for the branch, as last fetched. A chain break may\n+# approve a force-push replacing exactly this commit.\n+head_branch=\"\"\n+if [ \"$head_ref\" = HEAD ]; then\n+  head_branch=$(git -C \"$repo\" symbolic-ref --quiet --short HEAD 2>/dev/null) || head_branch=\"\"\n+elif git -C \"$repo\" show-ref --verify --quiet \"refs/heads/$head_ref\"; then\n+  head_branch=$head_ref\n+fi\n chain_args=()\n+if [ -n \"$predecessor\" ] && [ -n \"$head_branch\" ]; then\n+  chain_args+=(--remote-ref \"origin/$head_branch\")\n+  if remote_head=$(git -C \"$repo\" rev-parse --verify --quiet \"refs/remotes/origin/$head_branch^{commit}\" 2>/dev/null); then\n+    chain_args+=(--remote-head \"$remote_head\")\n+  fi\n+fi\n [ -z \"$predecessor\" ] || chain_args+=(--predecessor \"$predecessor\" --since \"$since\" --since-status \"$since_status\")\n [ -z \"$fallback\" ] || chain_args+=(--fallback \"$fallback\")\n [ -z \"$history\" ] || chain_args+=(--history \"$history\")\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/lib/kk-approval.sh",
+      "change_type": "modified",
+      "additions": 3,
+      "deletions": 1,
+      "diff_content": "@@ -45,7 +45,9 @@ def kk_ap_fold:\n           .built += [$e.packet]\n           | .packets[$e.packet] = {packet: $e.packet, ticket: $e.ticket, head: $e.head, base: $e.base,\n               base_ref: $e.base_ref, mode: ($e.mode // null), predecessor: ($e.predecessor // null),\n-              since: ($e.since // null), expires_at: $e.expires_at, built_i: $i, ready: [], feedback: [],\n+              since: ($e.since // null), chain_break: ($e.chain_break // null),\n+              remote_ref: ($e.remote_ref // null), remote_head: ($e.remote_head // null),\n+              expires_at: $e.expires_at, built_i: $i, ready: [], feedback: [],\n               approved: [], stalled: false, key: ($e.key // null), trigger: ($e.trigger // \"asked\")}\n         elif .packets[$e.packet // \"\"] == null then .\n         elif $e.event == \"state\" and $e.state == \"ready\" then\n",
+      "language": "bash"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "change_type": "modified",
+      "additions": 36,
+      "deletions": 17,
+      "diff_content": "@@ -14,20 +14,33 @@\n   (:import (java.security SecureRandom)))\n \n (def never \"Never granted here, whatever you choose: force-push, review request, merge.\")\n+(def never-on-break \"Never granted here, whatever you choose: review request, merge, or a force-push over any other remote head.\")\n \n (defn- short-sha [s] (subs (str s) 0 (min 12 (count (str s)))))\n \n+(defn lease\n+  \"The remote head a force-push may replace (PER-128): only on a chain break,\n+   only the one the packet recorded, and never the head itself.\"\n+  [{:keys [chain_break remote_head head]}]\n+  (when (and chain_break remote_head (not= remote_head head)) remote_head))\n+\n (defn choices\n-  \"The only three decisions the page offers. PR implies push.\"\n-  [head]\n-  (let [h (short-sha head)\n-        approve (str \"Approves exactly \" h \" and ends pre-push review. \")]\n-    [{:delivery \"none\" :actions [] :label \"Approve the code only\"\n-      :consequence (str approve \"Nothing is pushed, and Gatekeeper is not queued.\")}\n-     {:delivery \"push\" :actions [\"push\"] :label \"Approve and push\"\n-      :consequence (str approve \"Gatekeeper will push \" h \" to the ticket's branch once this decision is durably recorded, and not before. No PR is opened.\")}\n-     {:delivery \"pr\" :actions [\"pr\" \"push\"] :label \"Approve, push and open a PR\"\n-      :consequence (str approve \"Gatekeeper will push \" h \" and open a PR once this decision is durably recorded, and not before. Opening a PR includes the push.\")}]))\n+  \"The decisions the page offers. PR implies push. A chain break whose\n+   remote holds another commit adds a force-push bound to that commit.\"\n+  ([head] (choices head nil))\n+  ([head facts]\n+   (let [h (short-sha head)\n+         approve (str \"Approves exactly \" h \" and ends pre-push review. \")\n+         l (lease facts)]\n+     (cond-> [{:delivery \"none\" :actions [] :label \"Approve the code only\"\n+               :consequence (str approve \"Nothing is pushed, and Gatekeeper is not queued.\")}\n+              {:delivery \"push\" :actions [\"push\"] :label \"Approve and push\"\n+               :consequence (str approve \"Gatekeeper will push \" h \" to the ticket's branch once this decision is durably recorded, and not before. No PR is opened.\")}\n+              {:delivery \"pr\" :actions [\"pr\" \"push\"] :label \"Approve, push and open a PR\"\n+               :consequence (str approve \"Gatekeeper will push \" h \" and open a PR once this decision is durably recorded, and not before. Opening a PR includes the push.\")}]\n+       l (conj {:delivery \"force-push\" :actions [\"force-push\"] :lease l :label \"Approve and force-push\"\n+                :consequence (str approve \"Gatekeeper will force-push \" h \" over \" (:remote_ref facts) \" with --force-with-lease, replacing exactly \"\n+                                  l \", and refuses if the remote is anywhere else. No PR is opened.\")})))))\n \n (defn dispatch\n   \"Where Gatekeeper stands for a decision, from kk-dispatch's derived job\n@@ -123,15 +136,17 @@\n           d (:decision json)\n           b (blocked cfg login pid json)\n           shown {:ticket (:ticket json) :digest (:digest f) :head (:head f) :base (:base f) :policy (:policy json)\n-                 :revision (:issue_revision json) :feedback (:blocking_feedback f) :supersede (:id d)}]\n+                 :revision (:issue_revision json) :feedback (:blocking_feedback f) :supersede (:id d)\n+                 :lease (lease f)}]\n       {:status 200\n-       :body (merge (dissoc shown :supersede :feedback)\n+       :body (merge (dissoc shown :supersede :feedback :lease)\n                     {:packet pid :base-ref (:base_ref f) :expires-at (:expires_at f)\n+                     :chain-break (:chain_break f) :remote-ref (:remote_ref f) :remote-head (:remote_head f)\n                      :decision (when d (assoc (decision-view d (:publication json)) :valid (:valid json) :reasons (mapv :text (:reasons json))))\n                      :blocked b\n-                     :never never}\n+                     :never (if (:lease shown) never-on-break never)}\n                     (when-not b\n-                      (merge {:choices (choices (:head f))} (issue-nonce! cfg login pid shown))))})))\n+                      (merge {:choices (choices (:head f) f)} (issue-nonce! cfg login pid shown))))})))\n \n (defn view\n   \"What the approval panel shows. A nonce only when there is something to\n@@ -173,7 +188,8 @@\n   [cfg {:keys [login node]} pid {:keys [nonce delivery]}]\n   (cond\n     (not (contains? (:approvers cfg) login)) {:status 403 :body {:error \"This login may not approve.\"}}\n-    (not (some #(= delivery (:delivery %)) (choices \"\"))) {:status 400 :body {:error \"Choose none, push or pr. Nothing else can be granted here.\"}}\n+    (not (some #(= delivery (:delivery %)) (choices \"\" {:chain_break \"x\" :remote_head \"x\"})))\n+    {:status 400 :body {:error \"Choose none, push, pr or force-push. Nothing else can be granted here.\"}}\n     (not (and (string? nonce) (re-matches nonce-re nonce))) {:status 403 :body {:error \"This confirmation carries no nonce. Refresh.\"}}\n     :else\n     (store/with-lock\n@@ -186,6 +202,8 @@\n          (cond\n            (not (and issued (= login (:login issued)) (= pid (:packet issued))))\n            {:status 403 :body {:error \"This confirmation was not issued to you for this packet. Refresh.\"}}\n+           (and (= \"force-push\" delivery) (nil? (:lease s)))\n+           {:status 409 :body {:error \"This confirmation offered no force-push.\" :stale true :next \"Refresh to see the packet as it is now.\"}}\n            (and used (not= delivery (:delivery used)))\n            {:status 409 :body {:error (str \"This confirmation was already used to choose \" (:delivery used) \".\")\n                                :stale true :next \"Refresh to decide again.\"}}\n@@ -200,10 +218,11 @@\n            (do\n              (when-not used\n                (store/create-once! (nonce-file cfg pid nonce \".used\") (pr-str {:delivery delivery :login login :at (store/now)})))\n-             (let [{:keys [exit json err]} (run cfg \"decide\" pid delivery login (str node)\n+             (let [{:keys [exit json err]} (apply run cfg \"decide\" pid delivery login (str node)\n                                                 (str (:digest s)) (str (:head s)) (str (:base s)) (str (:policy s))\n                                                 (if (:revision s) (str (:revision s)) \"-\")\n-                                                (str (:feedback s)) (or (:supersede s) \"-\"))]\n+                                                (str (:feedback s)) (or (:supersede s) \"-\")\n+                                                (when (= \"force-push\" delivery) [(:lease s)]))]\n                (if (and (= 0 exit) (map? json))\n                  (do (store/write-atomic! (nonce-file cfg pid nonce \".result\") (pr-str json))\n                      (recorded cfg login pid json))\n",
+      "language": null
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "change_type": "modified",
+      "additions": 8,
+      "deletions": 3,
+      "diff_content": "@@ -1,8 +1,9 @@\n (ns review-feedback.approval\n   \"Approve this packet (PER-78): one decision that approves the exact reviewed\n-   revision, ends pre-push review and picks its delivery \u2014 code only, push, or\n-   push and PR. The service decides what may be offered; this only shows it,\n-   asks for one confirmation, and never says Gatekeeper ran unless told so.\"\n+   revision, ends pre-push review and picks its delivery \u2014 code only, push,\n+   push and PR, or on a chain break a force-push at the recorded lease. The\n+   service decides what may be offered; this only shows it, asks for one\n+   confirmation, and never says Gatekeeper ran unless told so.\"\n   (:require [clojure.string :as str]))\n \n (def meta-el (js/document.querySelector \"meta[name=review-feedback]\"))\n@@ -98,6 +99,9 @@\n    [:dt \"Digest\"] [:dd.ap-mono (:digest v)]\n    [:dt \"Reviewed head\"] [:dd.ap-mono (:head v)]\n    [:dt \"Base\"] [:dd.ap-mono (str (:base v) (when (:base-ref v) (str \" (\" (:base-ref v) \")\")))]\n+   (when (:chain-break v) [:dt \"Chain break\"]) (when (:chain-break v) [:dd (:chain-break v)])\n+   (when (:remote-head v) [:dt \"Remote head\"])\n+   (when (:remote-head v) [:dd.ap-mono (str (:remote-head v) (when (:remote-ref v) (str \" (\" (:remote-ref v) \")\")))])\n    [:dt \"Policy\"] [:dd (:policy v)]\n    [:dt \"Expires\"] [:dd (:expires-at v)]])\n \n@@ -129,6 +133,7 @@\n      [:p [:strong (str \"Confirm: \" (:label c))]]\n      [facts (:view s)]\n      [:p (grants (:actions c))]\n+     (when (:lease c) [:p.ap-mono (str \"Lease: the remote must be at \" (:lease c))])\n      [:p (:consequence c)]\n      [:p.rf-hint (:never (:view s))]\n      [:div.rf-row\n",
+      "language": null
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/build.clj",
+      "change_type": "modified",
+      "additions": 7,
+      "deletions": 3,
+      "diff_content": "@@ -69,7 +69,8 @@\n \n (def flags #{\"--ticket\" \"--repo\" \"--base\" \"--head\" \"--base-ref\" \"--base-source\" \"--head-ref\"\n              \"--root\" \"--out\" \"--base-url\" \"--retention-days\" \"--now\" \"--merge-base\"\n-             \"--predecessor\" \"--since\" \"--since-status\" \"--fallback\" \"--history\"})\n+             \"--predecessor\" \"--since\" \"--since-status\" \"--fallback\" \"--history\"\n+             \"--remote-ref\" \"--remote-head\"})\n \n (defn parse-args [args]\n   (loop [[a v & more :as all] args acc {}]\n@@ -119,7 +120,8 @@\n \n (defn run [args]\n   (let [{:keys [ticket repo base head base-ref base-source head-ref root out base-url\n-                retention-days now merge-base predecessor since since-status fallback history]\n+                retention-days now merge-base predecessor since since-status fallback history\n+                remote-ref remote-head]\n          :or {retention-days \"14\"}}\n         (validate (parse-args args))\n         now (if (str/blank? now) (Instant/now) (Instant/parse now))\n@@ -160,7 +162,9 @@\n                                                       {:predecessor predecessor :head since\n                                                        :reason (when-not step (:reason chain))})\n                                       :step-paths step-paths\n-                                      :history (chain/history packets rows)}\n+                                      :history (chain/history packets rows)\n+                                      :remote (when-not (str/blank? remote-ref)\n+                                                {:ref remote-ref :head (not-empty remote-head)})}\n                                      changed)\n           target (or (not-empty out) (str root \"/\" (:packet/id packet)))]\n       (when (and (str/blank? out) (.exists (io/file target)))\n",
+      "language": null
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "change_type": "modified",
+      "additions": 19,
+      "deletions": 4,
+      "diff_content": "@@ -319,7 +319,7 @@\n    deciding whether the packet is right, and a shuffled one is a file nobody\n    can skim.\"\n   [:packet/id :packet/version :packet/created-at :packet/expires-at :packet/url\n-   :ticket/id :repo/path :range :chain :since-review :history :summary :narrative\n+   :ticket/id :repo/path :range :chain :since-review :chain-break :history :summary :narrative\n    :files :hunks :collapsed :tests :risks :gaps :warnings\n    :facts/digest :narrative/digest :comprehension :validation])\n \n@@ -346,7 +346,7 @@\n    :stats. :files is here with each :role taken out, because the role is the\n    writer's.\"\n   [:packet/id :packet/version :packet/created-at :packet/expires-at :packet/url\n-   :ticket/id :repo/path :range :chain :since-review :history :summary :files :hunks])\n+   :ticket/id :repo/path :range :chain :since-review :chain-break :history :summary :files :hunks])\n \n (defn canonical\n   \"A value in one spelling whatever map types it went through: keys and\n@@ -408,11 +408,25 @@\n                                       (array-map :path p :restored? true)))\n                             step-paths))))\n \n+(def rewrites\n+  \"Chain reasons that mean the reviewed history was rewritten (PER-128).\"\n+  #{:not-descendant :predecessor-head-missing})\n+\n+(defn- chain-break\n+  \"A follow-up whose last reviewed head is no longer in the branch's history:\n+   no packet-to-packet diff can be trusted, so the review starts again from the\n+   whole change. `remote` is what origin held for the branch at build time.\"\n+  [chain since-review remote]\n+  (when (and since-review (rewrites (:reason chain)))\n+    (array-map :reason (:reason chain) :reason/text (:reason/text chain)\n+               :predecessor (:predecessor since-review) :reviewed-head (:head since-review)\n+               :remote/ref (:ref remote) :remote/head (:head remote))))\n+\n (defn build-packet\n   \"`changed` is `[{:record \u2026 :block \u2026}]` from `gitdiff/changed-files`.\n-   `since-review`, `step-paths` and `history` are for a follow-up only.\"\n+   `since-review`, `step-paths`, `history` and `remote` are for a follow-up only.\"\n   [{:keys [ticket repo base head base-ref base-source head-ref merge-base? base-url\n-           retention-days now dirty? chain since-review step-paths history]}\n+           retention-days now dirty? chain since-review step-paths history remote]}\n    changed]\n   (let [built (mapv #(build-file (:record %) (:block %)) changed)\n         labelled (label-per-file (assign-ids (mapcat :hunks built)))\n@@ -488,6 +502,7 @@\n      :warnings (warnings-for dirty? files))\n         packet (cond-> packet\n                  since-review (assoc-array :since-review (since-facts since-review step-paths files hunk-index))\n+                 (chain-break chain since-review remote) (assoc-array :chain-break (chain-break chain since-review remote))\n                  (seq history) (assoc-array :history (vec history)))]\n     ;; Last, over everything above: the pin every later step is held to.\n     (assoc-array packet :facts/digest (facts-digest packet))))\n",
+      "language": null
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+      "change_type": "modified",
+      "additions": 52,
+      "deletions": 2,
+      "diff_content": "@@ -464,11 +464,53 @@\n                 \"</ul>\"\n                 (when (str/blank? hunks)\n                   (str \"<p>\" (step-link predecessor (:packet/id packet) \"step.html\") \"</p>\")))\n-           (str \"<p class=\\\"empty\\\">No packet-to-packet diff: \"\n+           (when-not (:chain-break packet)\n+            (str \"<p class=\\\"empty\\\">No packet-to-packet diff: \"\n                 (esc (if (rebased reason) \"the branch was rebased\" (str/replace (str (get-in packet [:chain :reason/text])) #\"\\.$\" \"\")))\n-                \".</p>\"))\n+                \".</p>\")))\n          \"</section>\"))))\n \n+(defn- break-remote\n+  \"What the remote holds, and what approval may do about it (PER-128).\"\n+  [{rref :remote/ref rhead :remote/head} head]\n+  (cond\n+    (nil? rref) \"Its remote head was not recorded, so this page cannot approve a force-push.\"\n+    (nil? rhead) (str \"<code>\" (esc rref) \"</code> did not exist when this packet was built, so an ordinary push publishes it.\")\n+    (= rhead head) (str \"<code>\" (esc rref) \"</code> already holds it.\")\n+    :else (str \"Publishing it replaces <code>\" (esc rhead) \"</code> on <code>\" (esc rref) \"</code>, so you may also \"\n+               \"approve a force-push that replaces exactly that commit. Gatekeeper pushes with \"\n+               \"<code>--force-with-lease</code> and refuses if the remote has moved.\")))\n+\n+(defn break-section\n+  \"A review-chain break (PER-128): the last reviewed head is no longer in the\n+   branch, so no delta can be trusted. Says so before anything else, links the\n+   packet Ethan last acted on, and names every SHA the approval turns on.\"\n+  [packet]\n+  (when-let [{:keys [predecessor reviewed-head] why :reason/text :as b} (:chain-break packet)]\n+    (let [{:keys [base head] :as r} (:range packet)\n+          acted (first (filter #(= predecessor (:packet/id %)) (:history packet)))\n+          href (get *links* predecessor)\n+          row (fn [label v]\n+                (str \"<tr><th>\" label \"</th><td>\" (if v (str \"<code>\" (esc v) \"</code>\") \"<span class=\\\"hstate\\\">none</span>\")\n+                     \"</td></tr>\"))]\n+      (str \"<section class=\\\"break\\\" id=\\\"chain-break\\\">\"\n+           \"<h2>Review chain broken: no incremental diff</h2>\"\n+           \"<p>\" (esc why) \" The commits you reviewed in \"\n+           (if href\n+             (str \"<a class=\\\"plink\\\" href=\\\"\" (esc href) \"\\\">\" (esc predecessor) \"</a>\")\n+             (str \"<span class=\\\"pid\\\">\" (esc predecessor) \"</span> (expired)\"))\n+           (when acted (str \" (\" (response-html acted) \")\"))\n+           \" are not in this branch's history, so there is no trustworthy diff from them to this revision. \"\n+           \"This page shows the whole change instead: read it as a new review, not a follow-up.</p>\"\n+           \"<table class=\\\"shas\\\">\"\n+           (row \"last reviewed head\" reviewed-head)\n+           (row (str \"comparison base, \" (compared-with r)) base)\n+           (row \"current head\" head)\n+           (row (str \"remote head\" (when-let [rr (:remote/ref b)] (str \", \" (esc rr)))) (:remote/head b))\n+           \"</table>\"\n+           \"<p>Approving this packet approves exactly <code>\" (esc head) \"</code>. \" (break-remote b head) \"</p>\"\n+           \"</section>\"))))\n+\n (defn intro [packet]\n   (let [n (:narrative packet)]\n     (str \"<header class=\\\"lede\\\">\"\n@@ -476,6 +518,7 @@\n          \" <span class=\\\"dot\\\">\u00b7</span> <span class=\\\"pid\\\">\"\n          (esc (:packet/id packet)) \"</span></p>\"\n          (history-section packet)\n+         (break-section packet)\n          \"<h1>\" (if-let [t (present (:title n))] (blk \"title\" t) (esc (:ticket/id packet))) \"</h1>\"\n          (labelled \"context\" \"the system\" (:context n))\n          (labelled \"problem\" \"the problem\" (:problem n))\n@@ -883,6 +926,13 @@ a:focus-visible,summary:focus-visible,button:focus-visible{\n .since-files li{margin:0 0 .25rem}\n .banner{margin:.8rem 0;padding:.6rem .7rem;border:1px solid var(--rule);\n   border-left:3px solid var(--del);border-radius:4px;background:var(--raised)}\n+.break{margin:.8rem 0 1rem;padding:.6rem .7rem;border:1px solid var(--rule);\n+  border-left:3px solid var(--del);border-radius:4px;background:var(--raised)}\n+.break h2{margin:0 0 .4rem;color:var(--del)}\n+.break p{margin:0 0 .4rem}\n+.shas{border-collapse:collapse;margin:.2rem 0 .6rem;font-size:.9rem}\n+.shas th{text-align:left;font-weight:normal;color:var(--muted);padding:.1rem .8rem .1rem 0;vertical-align:top}\n+.shas td{overflow-wrap:anywhere}\n .full-cta{margin:.8rem 0;padding:.6rem .7rem;border:1px solid var(--rule);\n   border-left:3px solid var(--green);border-radius:4px;background:var(--raised)}\n .full-cta p{margin:0 0 .4rem}\n",
+      "language": null
+    }
+  ],
+  "intent": {
+    "summary": "Allow the review-packet/approval system to recognize when a branch has been history-rewritten (rebased) since the last reviewed packet, and to let an approver explicitly authorize a lease-scoped force-push to republish that exact rebased commit instead of silently treating it as an unreviewable gap.",
+    "reasoning": "The change introduces a `chain-break` concept across the packet model, renderer, bash glue scripts, and Clojure approval service, all gated on chain reasons `not-descendant`/`predecessor-head-missing`. It adds a brand-new `force-push` delivery option whose validity is tightly bound to a `lease` (the exact remote head recorded on the chain-break packet), mirroring git's `--force-with-lease` semantics \u2014 this is clearly solving 'the last reviewed commit no longer exists in history, so how do we safely let a reviewer re-publish the rewritten branch' (PER-128).",
+    "confidence": 0.9
+  },
+  "impact_map": {
+    "direct_impacts": [
+      {
+        "area": "review-packet build pipeline (build.clj, model.clj, render.clj)",
+        "description": "New --remote-ref/--remote-head inputs and a chain-break record are threaded through packet construction and rendered as a dedicated warning section with SHA table and force-push explanation.",
+        "severity": "medium"
+      },
+      {
+        "area": "approval decision service (approval.clj/.cljs)",
+        "description": "Adds a fourth delivery choice (force-push) gated by a server-computed lease, changes the 400/409 error contract, and changes what 'never' means depending on whether a lease is offered.",
+        "severity": "high"
+      },
+      {
+        "area": "kk-packet-approval.sh / kk-approval.sh / lib/kk-approval.sh",
+        "description": "New 13th positional arg (lease), new validated `force-push` case that re-queries kk-approval status to confirm chain_break + matching remote_head before allowing the action, and new fields threaded through the event-fold state machine.",
+        "severity": "high"
+      },
+      {
+        "area": "kk-review-packet.sh",
+        "description": "Reads local refs/remotes/origin/<branch> to capture remote-ref/remote-head without an explicit fetch step in the shown diff, feeding directly into the lease logic.",
+        "severity": "medium"
+      }
+    ],
+    "indirect_impacts": [
+      {
+        "area": "Gatekeeper dispatch / modules/kingkong-manager.nix (not shown)",
+        "description": "The `--action force-push --lease <sha>` contract is produced here but its consumer (the actual `git push --force-with-lease` invocation) is not part of this diff, so correctness of the safety guarantee cannot be verified from this change alone.",
+        "severity": "high"
+      },
+      {
+        "area": "Existing packet consumers/schemas",
+        "description": "New keys (chain_break, remote_ref, remote_head, :chain-break) added to packet.json, approval facts JSON, and the canonical/public key allowlists in model.clj; any strict external JSON schema validators or downstream tooling not shown could reject or ignore these fields.",
+        "severity": "low"
+      },
+      {
+        "area": "Narrative generation for non-incremental chain reasons",
+        "description": "Reclassifying not-descendant/predecessor-head-missing as 'chain-break' changes the jq branch order in send_brief, altering what text reviewers/LLM narrators see for cases previously treated as generic 'full packet' reasons.",
+        "severity": "low"
+      }
+    ],
+    "affected_components": [
+      "review-packet build/model/render (Clojure)",
+      "review-feedback approval service and UI (Clojure/ClojureScript)",
+      "kk-packet-approval.sh",
+      "kk-approval.sh and lib/kk-approval.sh",
+      "kk-packet.sh brief generation",
+      "kk-review-packet.sh"
+    ]
+  },
+  "risk_assessment": {
+    "overall_risk": "high",
+    "risks": [
+      {
+        "description": "A brand-new destructive capability (force-push) is being wired into an automated approval/dispatch pipeline; any gap in the gating logic could let a force-push proceed against the wrong commit or a non-chain-break packet.",
+        "severity": "critical",
+        "mitigation": "Multiple layers are implemented: Clojure decide only accepts force-push if the session-stored `:lease` was set when choices were issued; kk-packet-approval.sh re-queries kk-approval status at decide time to confirm chain_break + matching remote_head + lease != head; downstream push is presumably `--force-with-lease`, which fails safely if remote has moved.",
+        "edge_cases": [
+          "TOCTOU window between the status re-check in kk-packet-approval.sh and the actual push executed later by Gatekeeper",
+          "A stale local refs/remotes/origin tracking ref in kk-review-packet.sh causing a lease value that doesn't reflect true remote state (mitigated by force-with-lease failing safely, but not verified since Gatekeeper code isn't in this diff)",
+          "Multiple packets for the same ticket where an older packet's recorded chain_break/remote_head could satisfy the check if kk-approval status does not strictly return only the newest packet's facts"
+        ]
+      },
+      {
+        "description": "The actual consumer of the new `--lease` flag (presumably Gatekeeper's push logic) is not part of this diff, so it's unverified whether the lease is actually passed to `git push --force-with-lease` or merely logged/ignored.",
+        "severity": "high",
+        "mitigation": "Verify Gatekeeper/dispatch code (not shown) honors the lease as the exact `--force-with-lease=<ref>:<expected-sha>` value.",
+        "edge_cases": [
+          "Lease silently dropped, resulting in an unconditional force-push",
+          "Lease applied to the wrong ref if `remote_ref` parsing/quoting is mishandled downstream"
+        ]
+      },
+      {
+        "description": "No test files appear in the diff despite the project declaring 'Has Tests: Yes', for a change that expands destructive action surface and alters narrative/UI branching logic.",
+        "severity": "medium",
+        "mitigation": "Confirm whether tests exist elsewhere/were run but not included in this commit's diff, or add targeted tests for chain-break detection, the force-push gate, and the Clojure decide error paths.",
+        "edge_cases": [
+          "Regression in non-chain-break paths (e.g., existing `not-descendant` full-packet narrative) due to the new elif branch ordering in kk-packet.sh's jq filter"
+        ]
+      },
+      {
+        "description": "UI/consequence text asserts strong guarantees ('refuses if the remote is anywhere else') that depend entirely on correct downstream enforcement not visible in this diff, risking false reassurance to human approvers.",
+        "severity": "medium",
+        "mitigation": "Ensure the stated guarantee is actually enforced end-to-end before shipping the UI copy.",
+        "edge_cases": [
+          "Approver trusts the message and approves, but a bug in dispatch performs a plain force-push without the lease check"
+        ]
+      }
+    ],
+    "breaking_changes": false,
+    "requires_migration": false
+  },
+  "review_questions": [
+    {
+      "question": "Where is the new `--lease` value actually consumed to perform `git push --force-with-lease`? Can you show the Gatekeeper/dispatch code path, since it's not part of this diff?",
+      "context": "The entire safety story for allowing force-push through an automated approval pipeline hinges on this being correctly wired; without seeing it, the gating logic added here could be necessary but not sufficient.",
+      "priority": "critical"
+    },
+    {
+      "question": "Does `kk-approval status <ticket>` always report facts for the ticket's current/newest packet only, guaranteeing the force-push check in kk-packet-approval.sh can't be satisfied using a stale, superseded packet's chain_break/remote_head?",
+      "context": "The inline comment claims this invariant ('only while it is still this ticket's newest packet') but the jq filter itself doesn't visibly enforce it \u2014 it just matches on packet id.",
+      "priority": "high"
+    },
+    {
+      "question": "Is there a fetch step guaranteed immediately before kk-review-packet.sh reads refs/remotes/origin/<branch>, or could remote_head be built from an arbitrarily stale local tracking ref?",
+      "context": "Even though --force-with-lease fails safely on mismatch, a stale remote_head could cause confusing 'chain break' UI messaging or an unnecessary refusal/approval mismatch for reviewers relying on this page as ground truth.",
+      "priority": "medium"
+    },
+    {
+      "question": "Are there automated tests covering the new chain-break classification, the force-push lease validation (both the Clojure decide 409 path and the shell re-check), and the render.clj break-section output?",
+      "context": "The project has test infrastructure, but no test changes accompany a change that adds a new destructive action path and multiple new branches in brief/narrative generation.",
+      "priority": "high"
+    },
+    {
+      "question": "Could `not-descendant` or `predecessor-head-missing` ever legitimately occur without an actual untrusted history rewrite (e.g., shallow clone artifacts, submodule quirks, or a squash-merge that's still content-equivalent), causing an unnecessary chain-break escalation and blocking the simpler incremental flow?",
+      "context": "Unconditionally treating these two reasons as `rewrites` changes both the narrative instructions and available approval choices; false positives would add friction, false negatives would under-protect.",
+      "priority": "medium"
+    }
+  ],
+  "analysis_model": "claude-sonnet-5",
+  "analysis_timestamp": "2026-11-03T08:01:03.008414",
+  "tokens_used": 21934,
+  "diff_coverage": {
+    "budget_tokens": 60000,
+    "shown_lines": 202,
+    "total_lines": 202,
+    "trimmed": [],
+    "omitted": [],
+    "noise": [],
+    "percent": 100
+  }
+}

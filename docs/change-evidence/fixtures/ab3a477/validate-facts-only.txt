@@ -1,0 +1,60 @@
+kk-review-packet: this packet has no narrative written into it yet. Every prose slot is still empty, so most of what follows is 'the writer has not run', not 'the writer got it wrong'.
+p-20261101-6717b1  PER-172  INVALID — 56 violation(s)
+  [coverage] H-001: is not accounted for anywhere — agents/gatekeeper.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-002: is not accounted for anywhere — agents/personal/gatekeeper.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-003: is not accounted for anywhere — agents/personal/stack-manager.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-004: is not accounted for anywhere — agents/personal/stack-manager.md H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-005: is not accounted for anywhere — agents/stack-manager.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-006: is not accounted for anywhere — agents/stack-manager.md H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-007: is not accounted for anywhere — skills/engineering-manager/SKILL.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-008: is not accounted for anywhere — skills/engineering-manager/references/stacking.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-009: is not accounted for anywhere — skills/engineering-manager/references/stacking.md H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-010: is not accounted for anywhere — skills/engineering-manager/scripts/kk-dispatch.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-011: is not accounted for anywhere — skills/engineering-manager/scripts/kk-dispatch.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-012: is not accounted for anywhere — skills/engineering-manager/scripts/kk-dispatch.sh H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-013: is not accounted for anywhere — skills/engineering-manager/scripts/kk-grant.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-014: is not accounted for anywhere — skills/engineering-manager/scripts/kk-may.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-015: is not accounted for anywhere — skills/engineering-manager/scripts/kk-packet.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-016: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-017: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-018: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-019: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H4 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-020: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H5 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-021: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H6 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-022: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H7 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-023: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H8 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-024: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H9 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-025: is not accounted for anywhere — skills/engineering-manager/scripts/kk-restack.sh H10 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-026: is not accounted for anywhere — skills/engineering-manager/tests/README.md H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-027: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H1 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-028: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H2 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-029: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H3 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-030: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H4 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-031: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H5 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-032: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H6 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-033: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H7 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [coverage] H-034: is not accounted for anywhere — skills/engineering-manager/tests/run-tests.sh H8 reaches the reader in neither the narrative's evidence nor a collapsed group
+  [required-fields] files[].role: is missing on files[0] agents/gatekeeper.md
+  [required-fields] files[].role: is missing on files[10] skills/engineering-manager/scripts/kk-restack.sh
+  [required-fields] files[].role: is missing on files[11] skills/engineering-manager/tests/README.md
+  [required-fields] files[].role: is missing on files[12] skills/engineering-manager/tests/run-tests.sh
+  [required-fields] files[].role: is missing on files[1] agents/personal/gatekeeper.md
+  [required-fields] files[].role: is missing on files[2] agents/personal/stack-manager.md
+  [required-fields] files[].role: is missing on files[3] agents/stack-manager.md
+  [required-fields] files[].role: is missing on files[4] skills/engineering-manager/SKILL.md
+  [required-fields] files[].role: is missing on files[5] skills/engineering-manager/references/stacking.md
+  [required-fields] files[].role: is missing on files[6] skills/engineering-manager/scripts/kk-dispatch.sh
+  [required-fields] files[].role: is missing on files[7] skills/engineering-manager/scripts/kk-grant.sh
+  [required-fields] files[].role: is missing on files[8] skills/engineering-manager/scripts/kk-may.sh
+  [required-fields] files[].role: is missing on files[9] skills/engineering-manager/scripts/kk-packet.sh
+  [required-fields] narrative.context: is missing
+  [required-fields] narrative.overview: is missing
+  [required-fields] narrative.problem: is missing
+  [required-fields] narrative.scope.in: needs at least 1 entry, has 0
+  [required-fields] narrative.scope.out: needs at least 1 entry, has 0
+  [required-fields] narrative.sections: needs at least 1 entry, has 0
+  [required-fields] narrative.thesis: is missing
+  [required-fields] narrative.title: is missing
+  [required-fields] tests: needs at least 1 entry, has 0
+  warning: No risks are named. A change with none is rare enough to be worth saying. (no-risks)
+kk-review-packet: 56 violation(s) — nothing renders until they are fixed.

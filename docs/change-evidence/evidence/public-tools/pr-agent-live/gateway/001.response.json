@@ -1,0 +1,21 @@
+{
+ "id": "3f51b9fe-fe50-412a-b334-ccfedea41cc5",
+ "object": "chat.completion",
+ "created": 1793710096,
+ "model": "claude-sonnet-5",
+ "choices": [
+  {
+   "index": 0,
+   "finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "```yaml\nreview:\n  estimated_effort_to_review_[1-5]: 1\n  relevant_tests: |\n    No\n  key_issues_to_review: []\n  security_concerns: |\n    No\n```"
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 4107,
+  "completion_tokens": 526,
+  "total_tokens": 4633
+ }
+}

@@ -1,0 +1,317 @@
+{
+  "chain" : {
+    "links" : [ ],
+    "mode" : "full",
+    "predecessor" : null,
+    "reason" : "first",
+    "reason/text" : "No earlier packet on this ticket was reviewed, so this packet covers the whole change."
+  },
+  "collapsed" : [ ],
+  "facts/digest" : "sha256:0c9395acd96d93976307e60662a584ff563930d014b98a2b6826283e25569013",
+  "files" : [ {
+    "binary?" : false,
+    "hunks" : [ "h:2bd5f6b0" ],
+    "path" : ".gitmodules",
+    "role" : null,
+    "stats" : {
+      "added" : 3,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:6adad910" ],
+    "path" : "crlf.txt",
+    "role" : null,
+    "stats" : {
+      "added" : 2,
+      "hunks" : 1,
+      "removed" : 2
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:af0df85d" ],
+    "path" : "flake.lock",
+    "role" : null,
+    "stats" : {
+      "added" : 1,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:de4a8dce" ],
+    "path" : "gone.txt",
+    "role" : null,
+    "stats" : {
+      "added" : 0,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "deleted"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:9311618d" ],
+    "path" : "kept.txt",
+    "path/from" : "keep.txt",
+    "role" : null,
+    "similarity" : 83,
+    "stats" : {
+      "added" : 1,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "renamed"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:22625719" ],
+    "path" : "moved-sub",
+    "role" : null,
+    "stats" : {
+      "added" : 1,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "modified"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:f8e5948c" ],
+    "path" : "new-sub",
+    "role" : null,
+    "stats" : {
+      "added" : 1,
+      "hunks" : 1,
+      "removed" : 0
+    },
+    "status" : "added"
+  }, {
+    "binary?" : false,
+    "hunks" : [ "h:7208303b" ],
+    "path" : "with space.txt",
+    "role" : null,
+    "stats" : {
+      "added" : 1,
+      "hunks" : 1,
+      "removed" : 1
+    },
+    "status" : "modified"
+  } ],
+  "gaps" : [ ],
+  "hunks" : {
+    "h:22625719" : {
+      "classification" : "code",
+      "diff/header" : "@@ -1 +1 @@",
+      "display/id" : "H-006",
+      "file" : "moved-sub",
+      "file/hunk-label" : "moved-sub H1",
+      "lines" : {
+        "new" : {
+          "count" : 1,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 1,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1 +1 @@\n-Subproject commit 9c3b58d9f44d72d7157c0167b77c1227e5b0cc83\n+Subproject commit 8f0ef3c1f2b57f2222d56bf64223ba657e634aee\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:2bd5f6b0" : {
+      "classification" : "code",
+      "diff/header" : "@@ -1,3 +1,6 @@",
+      "display/id" : "H-001",
+      "file" : ".gitmodules",
+      "file/hunk-label" : ".gitmodules H1",
+      "lines" : {
+        "new" : {
+          "count" : 6,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 3,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1,3 +1,6 @@\n [submodule \"moved-sub\"]\n \tpath = moved-sub\n \turl = https://example.invalid/sub.git\n+[submodule \"new-sub\"]\n+\tpath = new-sub\n+\turl = https://example.invalid/sub.git\n",
+      "stats" : {
+        "added" : 3,
+        "removed" : 0
+      }
+    },
+    "h:6adad910" : {
+      "classification" : "formatting-only",
+      "diff/header" : "@@ -1,2 +1,2 @@",
+      "display/id" : "H-002",
+      "file" : "crlf.txt",
+      "file/hunk-label" : "crlf.txt H1",
+      "lines" : {
+        "new" : {
+          "count" : 2,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 2,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1,2 +1,2 @@\n-x\n-y\n+x\n+y\n",
+      "stats" : {
+        "added" : 2,
+        "removed" : 2
+      }
+    },
+    "h:7208303b" : {
+      "classification" : "code",
+      "diff/header" : "@@ -1 +1 @@",
+      "display/id" : "H-008",
+      "file" : "with space.txt",
+      "file/hunk-label" : "with space.txt H1",
+      "lines" : {
+        "new" : {
+          "count" : 1,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 1,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1 +1 @@\n-v1\n+v2\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:9311618d" : {
+      "classification" : "code",
+      "diff/header" : "@@ -3,4 +3,4 @@ b",
+      "display/id" : "H-005",
+      "file" : "kept.txt",
+      "file/hunk-label" : "kept.txt H1",
+      "lines" : {
+        "new" : {
+          "count" : 4,
+          "start" : 3
+        },
+        "old" : {
+          "count" : 4,
+          "start" : 3
+        }
+      },
+      "patch" : "@@ -3,4 +3,4 @@ b\n c\n d\n e\n-f\n+F\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:af0df85d" : {
+      "classification" : "lockfile",
+      "diff/header" : "@@ -1 +1 @@",
+      "display/id" : "H-003",
+      "file" : "flake.lock",
+      "file/hunk-label" : "flake.lock H1",
+      "lines" : {
+        "new" : {
+          "count" : 1,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 1,
+          "start" : 1
+        }
+      },
+      "patch" : "@@ -1 +1 @@\n-lock 1\n+lock 2\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 1
+      }
+    },
+    "h:de4a8dce" : {
+      "classification" : "code",
+      "diff/header" : null,
+      "display/id" : "H-004",
+      "file" : "gone.txt",
+      "file/hunk-label" : "gone.txt H1",
+      "hunk/synthetic?" : true,
+      "patch" : "deleted file mode 100644\n",
+      "stats" : {
+        "added" : 0,
+        "removed" : 0
+      }
+    },
+    "h:f8e5948c" : {
+      "classification" : "code",
+      "diff/header" : "@@ -0,0 +1 @@",
+      "display/id" : "H-007",
+      "file" : "new-sub",
+      "file/hunk-label" : "new-sub H1",
+      "lines" : {
+        "new" : {
+          "count" : 1,
+          "start" : 1
+        },
+        "old" : {
+          "count" : 0,
+          "start" : 0
+        }
+      },
+      "patch" : "@@ -0,0 +1 @@\n+Subproject commit 8f0ef3c1f2b57f2222d56bf64223ba657e634aee\n",
+      "stats" : {
+        "added" : 1,
+        "removed" : 0
+      }
+    }
+  },
+  "narrative" : {
+    "context" : null,
+    "overview" : null,
+    "problem" : null,
+    "scope" : {
+      "in" : [ ],
+      "out" : [ ]
+    },
+    "sections" : [ ],
+    "thesis" : null,
+    "title" : null
+  },
+  "packet/created-at" : "2026-11-04T00:00:00Z",
+  "packet/expires-at" : "2026-11-18T00:00:00Z",
+  "packet/id" : "p-20261104-cb85a7",
+  "packet/url" : "https://botserver.tail86a93e.ts.net/review/p-20261104-cb85a7/",
+  "packet/version" : 2,
+  "range" : {
+    "base" : "6afb217d35396df6ae20c85e8a21285ff99bd5a7",
+    "base/ref" : "HEAD~2",
+    "base/source" : "explicit",
+    "head" : "a6ff4b52416e7709a75fb8540c77286219be0848",
+    "head/ref" : "HEAD~1",
+    "merge-base?" : false
+  },
+  "repo/path" : "/home/multicad/multica_workspaces/personal-672708764437/per-176-aa526066faf5/workdir/scratch-edge/repo",
+  "risks" : [ ],
+  "summary" : {
+    "stats" : {
+      "added" : 10,
+      "binary" : 0,
+      "by-classification" : {
+        "code" : 6,
+        "formatting-only" : 1,
+        "lockfile" : 1
+      },
+      "files" : 8,
+      "hunks" : 8,
+      "removed" : 6,
+      "renamed" : 1
+    }
+  },
+  "tests" : [ ],
+  "ticket/id" : "PER-176",
+  "warnings" : [ ]
+}

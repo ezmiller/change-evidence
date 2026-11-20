@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "change_set": {
+    "kind": "commit",
+    "ref": "2c0f3e74",
+    "head_sha": "2c0f3e741bce2b060e266252e6ecdd0dce377af7",
+    "base_sha": "5c41816df66092c69cebc8401a6fdd3d0c3f8a18",
+    "title": "fix(kk-packet): if-not instead of A && B || die, for SC2015 (PER-148)",
+    "description": "shellcheck flagged both pinned-SHA checks, which fails the nix build.\n\nCo-authored-by: multica-agent <[EMAIL_1]>",
+    "authors": [
+      "Ethan Miller <ethanzanemiller@gmail.com>"
+    ],
+    "date": "2026-10-29T16:38:05-04:00",
+    "commits": [
+      {
+        "short_hash": "2c0f3e74",
+        "subject": "fix(kk-packet): if-not instead of A && B || die, for SC2015 (PER-148)",
+        "author": "Ethan Miller <ethanzanemiller@gmail.com>"
+      }
+    ]
+  },
+  "files_changed": [
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "change_type": "modified",
+      "additions": 6,
+      "deletions": 4,
+      "diff_content": "@@ -292,8 +292,9 @@ if [ \"$cmd\" = import ]; then\n   project=$(kk-project \"$project_arg\") || exit 1\n   pr=$(gh pr view \"$pr_url\" --json number,title,body,url,author,baseRefOid,headRefOid,baseRefName,headRefName </dev/null) \\\n     || die \"gh could not read $pr_url; nothing was created\" 4\n-  is_sha \"$(jq -r '.headRefOid // \"\"' <<< \"$pr\")\" && is_sha \"$(jq -r '.baseRefOid // \"\"' <<< \"$pr\")\" \\\n-    || die \"gh returned no base and head commit for $pr_url\" 4\n+  if ! { is_sha \"$(jq -r '.headRefOid // \"\"' <<< \"$pr\")\" && is_sha \"$(jq -r '.baseRefOid // \"\"' <<< \"$pr\")\"; }; then\n+    die \"gh returned no base and head commit for $pr_url\" 4\n+  fi\n   pr_url=$(jq -r '.url' <<< \"$pr\")\n   found=$(kk_issue_list --project \"$project\" --metadata \"pr_url=$pr_url\" 2>/dev/null \\\n             | jq -r '[.issues[]? | select(.metadata.review_kind == \"external\")] | .[0].identifier // empty') \\\n@@ -941,8 +942,9 @@ start|ensure)\n   if [ \"$external\" = true ]; then\n     [ -z \"$pr_stale\" ] \\\n       || die \"$ticket is STALE: PR #$pr_number moved to ${pr_stale:0:12}. Its review stays bound to ${review_head:0:12}; nothing is built.\" 7\n-    is_sha \"$review_head\" && is_sha \"$review_base\" \\\n-      || die \"$ticket records no pinned PR base and head; run kk-packet import again\" 4\n+    if ! { is_sha \"$review_head\" && is_sha \"$review_base\"; }; then\n+      die \"$ticket records no pinned PR base and head; run kk-packet import again\" 4\n+    fi\n     if { [ -n \"$base_ref\" ] && [ \"$base_ref\" != \"$review_base\" ]; } || { [ -n \"$head_ref\" ] && [ \"$head_ref\" != \"$review_head\" ]; }; then\n       die \"$ticket is pinned to PR #$pr_number's base and head; --base and --head cannot change them\"\n     fi\n",
+      "language": "bash"
+    }
+  ],
+  "intent": {
+    "summary": "Refactor two 'A && B || die' short-circuit validation idioms into explicit if/fi blocks to satisfy ShellCheck's SC2015 warning, which was failing the Nix build.",
+    "reasoning": "The diff mechanically transforms the same boolean logic (is_sha check on head/base refs) from the `cond1 && cond2 || die` pattern into `if ! { cond1 && cond2; }; then die; fi`, with no change to the conditions themselves or the die messages/exit codes. The commit title and description explicitly reference SC2015 and a failing Nix build/lint gate.",
+    "confidence": 0.95
+  },
+  "impact_map": {
+    "direct_impacts": [
+      {
+        "area": "kk-packet.sh import command (PR SHA validation)",
+        "description": "Validation logic preserved exactly; only control-flow syntax changed, eliminating the SC2015 false-positive risk where 'die' succeeding would make the whole expression true",
+        "severity": "low"
+      },
+      {
+        "area": "kk-packet.sh start|ensure command (ticket pinned base/head validation)",
+        "description": "Same refactor applied to a second, structurally identical check for review_head/review_base SHAs",
+        "severity": "low"
+      },
+      {
+        "area": "CI/Nix build (shellcheck lint gate)",
+        "description": "Removes SC2015 warnings that were causing the Nix build to fail",
+        "severity": "medium"
+      }
+    ],
+    "indirect_impacts": [
+      {
+        "area": "Script exit behavior",
+        "description": "If 'die' does not actually exit (e.g., is a function that can return under some condition), behavior could subtly differ between the old && || pattern and the new if/fi pattern, though in the common case both are equivalent",
+        "severity": "low"
+      },
+      {
+        "area": "Other SC2015 occurrences in the file",
+        "description": "Only two instances were fixed; if other similar patterns exist elsewhere in kk-packet.sh or related scripts, the build may still fail or require follow-up fixes",
+        "severity": "low"
+      }
+    ],
+    "affected_components": [
+      "skills/engineering-manager/scripts/kk-packet.sh",
+      "import command",
+      "start|ensure command",
+      "is_sha helper",
+      "die helper"
+    ]
+  },
+  "risk_assessment": {
+    "overall_risk": "low",
+    "risks": [
+      {
+        "description": "Behavioral equivalence depends on 'die' always terminating the script (e.g., via exit/return non-zero); if 'die' is reused elsewhere with different semantics, the refactor assumption could be wrong",
+        "severity": "low",
+        "mitigation": "Confirm 'die' function's definition unconditionally exits with the given code and never returns",
+        "edge_cases": [
+          "die function trapped/overridden in a subshell",
+          "die called in a context where 'set -e' is disabled and failure to exit could allow execution to continue past the if block"
+        ]
+      },
+      {
+        "description": "Pure lint-driven refactor increases risk of silent logic drift (e.g., inverted condition, wrong grouping) despite being mechanical",
+        "severity": "low",
+        "mitigation": "Diff confirms conditions and die messages are unchanged in both hunks; add/verify shellcheck now passes clean and existing tests for kk-packet still pass",
+        "edge_cases": [
+          "grouping braces '{ ... }' with proper spacing/semicolon required by bash; a missing space or semicolon would cause a syntax error, but diff shows correct syntax"
+        ]
+      }
+    ],
+    "breaking_changes": false,
+    "requires_migration": false
+  },
+  "review_questions": [
+    {
+      "question": "Does shellcheck now pass cleanly on kk-packet.sh with no remaining SC2015 (or other) warnings, confirming the Nix build is unblocked?",
+      "context": "The stated motivation was a failing Nix build due to shellcheck; worth confirming no other instances of this pattern remain in the file or other scripts in the repo.",
+      "priority": "medium"
+    },
+    {
+      "question": "Is there a test (unit or integration) covering the 'gh returned no base and head commit' and 'ticket records no pinned PR base and head' error paths to confirm behavior is unchanged after the refactor?",
+      "context": "The repo has tests, so verifying these specific error branches are exercised would confirm the refactor is purely cosmetic.",
+      "priority": "medium"
+    },
+    {
+      "question": "Can you confirm 'die' always exits the script (e.g., via 'exit $code') rather than just printing and returning, to guarantee the if/fi refactor is semantically identical to the original && || pattern?",
+      "context": "The equivalence of the two control-flow styles hinges entirely on die's termination guarantee.",
+      "priority": "low"
+    }
+  ],
+  "analysis_model": "claude-sonnet-5",
+  "analysis_timestamp": "2026-11-03T07:58:34.745813",
+  "tokens_used": 4107,
+  "diff_coverage": {
+    "budget_tokens": 60000,
+    "shown_lines": 10,
+    "total_lines": 10,
+    "trimmed": [],
+    "omitted": [],
+    "noise": [],
+    "percent": 100
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "validation": {
+    "at": "2026-10-29T20:45:08.469708106Z",
+    "contract/version": 4,
+    "model/version": 2,
+    "ok": true,
+    "packet/id": "p-20261029-73e8ad",
+    "validator/version": 4,
+    "violations": []
+  },
+  "comprehension": {
+    "findings": [
+      {
+        "criterion": "overview",
+        "request": "\"Two bindings hold independently\" fits only the first half; the page and gates refuse rather than bind. Say instead: \"Two guarantees hold independently: the packet shows exactly the PR's code, and nothing can publish it.\"",
+        "severity": "advisory"
+      },
+      {
+        "criterion": "language",
+        "request": "Say what \"Ethan's yes\" approves, e.g. \"running import is Ethan's go-ahead for Programmer to check out the PR\", in the heading or first sentence.",
+        "section": "brief-or-mark-stale",
+        "severity": "advisory"
+      },
+      {
+        "criterion": "language",
+        "request": "Define \"delivery\" where `none` first appears, e.g. \"delivery, the action a decision would carry out (push, PR or `none`)\".",
+        "section": "page-records-only",
+        "severity": "advisory"
+      },
+      {
+        "criterion": "language",
+        "request": "Say once who the Change Summary Writer is, e.g. \"the agent that writes this packet's explanation\".",
+        "section": "what-ethan-reads",
+        "severity": "advisory"
+      }
+    ],
+    "narrative/digest": "sha256:c010439bf3a46af34473aff3a4476cf6d040cff016fba6d5ef4e0d9fe812eb15",
+    "packet/id": "p-20261029-73e8ad",
+    "recorded-at": "2026-10-29T20:45:08.469708106Z",
+    "understanding": {
+      "approach": "Add an import command that takes a PrimaryKids PR URL, reads the PR once, and records its base and head commit hashes on a dedicated ticket. Everything downstream is held to that head, and for such a ticket the approval page and every script behind it can only record that the review happened, never publish anything.",
+      "in-plain-words": "You can now paste a teammate's PR link and get a review page for exactly that PR's latest commit. The tool remembers which commit it was, refuses to build from anything else, and flags the review as out of date if the PR changes. The page only lets you mark it reviewed, and every script that could push or open a PR also refuses on its own, so a review can never turn into publishing someone else's code.",
+      "peripheral": "Status output, Ethan's notice and the summary writer's brief now name the PR and flag staleness; docs and Gatekeeper's instructions learn the import command and the EXTERNAL REVIEW refusal; argument parsing and the gh dependency are mechanical; tests add a fake gh that logs calls, a fake board that can create issues, and checks that no GitHub write or Gatekeeper call ever happens.",
+      "problem": "The tooling assumed every packet was Programmer's own code waiting to ship. Reviewing a colleague's PR meant hand-making a ticket, hand-checking-out the PR, and then facing a page whose buttons offered to push or open a PR for code Ethan never meant to ship, with feedback routed to Programmer as fixes. Nothing tied the review to the PR's exact commits.",
+      "reading-order": "Follows the data: the ticket must exist before anything can be checked out, the checkout must exist before the build verifies it, the packet must be correct before the page decides what can be done with it, and the scripts behind the page come last as the backstop if the page is bypassed.",
+      "risks": "Never run on a real PrimaryKids PR, so gh access for the openclaw user is unproven; checkout of a fork head is untried; a partial import failure can create a duplicate ticket; a stale mark is permanent; every ordinary decision now depends on a status call. The new tests pass, the full suite has one extra flaky failure tied to hash ordering, and a live run against a public jq fork PR used stand-ins. Gaps: no grouping label, history badge still says approved, an unneeded review-required flag remains.",
+      "sections": [
+        {
+          "advances": "Validates the URL, calls only `gh pr view`, and creates (or on re-run finds) one branchless ticket marked external with the PR's base and head hashes, so later steps have fixed commits to check against.",
+          "id": "import-pins-the-pr"
+        },
+        {
+          "advances": "Turns that ticket into work: if the PR head has moved since import, it marks the ticket STALE and stops; otherwise it tells Programmer to check out exactly the pinned head, treating the PR description as untrusted text.",
+          "id": "brief-or-mark-stale"
+        },
+        {
+          "advances": "Makes the packet build refuse any other range: overrides are rejected, the diff runs from the merge base like GitHub's, and the build reports the commit actually on disk so a checkout that differs from the pinned head (checked before and after building) yields no packet.",
+          "id": "build-at-the-pinned-head"
+        },
+        {
+          "advances": "Passes the ticket's external kind to the page server, which replaces push/PR/force-push choices with a single Record review that grants nothing, rejects any other request server-side, and so never starts a Gatekeeper job; ordinary packets look unchanged.",
+          "id": "page-records-only"
+        },
+        {
+          "advances": "Repeats the refusal in each script a grant could pass through: kk-packet-approval records only no-action decisions and refuses dispatch, kk-may refuses code actions on external tickets before reading any approval, and feedback to Programmer is refused.",
+          "id": "every-gate-refuses"
+        }
+      ],
+      "system": "An engineering-manager skill that runs Ethan's coding agents on a task board. Its kk-packet command builds a review page for a ticket's commits (diff, explanation, approval panel); approving on that panel can grant a push or PR, which becomes a job for Gatekeeper, the one agent allowed to publish, after it checks kk-may."
+    },
+    "verdict": "pass"
+  }
+}

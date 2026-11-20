@@ -1,0 +1,53 @@
+agents/gatekeeper.md
+  M  heading     Stacked work
+
+agents/personal/gatekeeper.md
+  M  heading     Stacked work
+
+agents/personal/stack-manager.md
+  M  heading     Use kk-restack
+  M  heading     A ticket Ethan reviews in packets
+
+agents/stack-manager.md
+  M  heading     Use kk-restack
+  M  heading     A ticket Ethan reviews in packets
+
+skills/engineering-manager/SKILL.md
+  M  heading     Use the scripts
+
+skills/engineering-manager/references/stacking.md
+  M  heading     Who does what
+  M  heading     Who does it, and how
+
+skills/engineering-manager/scripts/kk-dispatch.sh
+  M  orphan      module-level
+  M  orphan      module-level
+  M  function    settle_restack
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-grant.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-may.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-packet.sh
+  M  orphan      module-level
+
+skills/engineering-manager/scripts/kk-restack.sh
+  M  orphan      module-level
+  M  orphan      module-level
+  M  orphan      module-level
+
+skills/engineering-manager/tests/README.md
+  M  heading     Adding a case
+
+skills/engineering-manager/tests/run-tests.sh
+  M  orphan      module-level
+  M  orphan      module-level
+  M  orphan      module-level
+  M  orphan      module-level
+  M  function    pq_safe
+  M  orphan      module-level
+
+26 modified across 13 files (14 modified orphans)

@@ -1,0 +1,239 @@
+{
+  "packet/id": "p-20261101-88dfd0",
+  "narrative": {
+    "title": "A rebased follow-up packet says so plainly and can approve a bound force-push",
+    "context": "Before any code leaves the machine, King Kong builds Ethan a review packet: a static page, `review.html`, holding the change, an essay about it, and buttons to approve it. `kk-review-packet build` collects the facts, `render` draws the page, and a small approval service records Ethan's decision in the ticket's history. Gatekeeper, a separate job, then pushes only what that decision allows. When a branch changes after Ethan reviewed it, the next packet is a follow-up that normally opens on the incremental diff: only what changed since the packet Ethan last acted on.",
+    "problem": "A rebase rewrites a branch's commits, so the head Ethan reviewed is no longer in the branch's history and no incremental diff can be computed. The build already fell back to showing the whole change, but the page said so in one muted line, \"No packet-to-packet diff: the branch was rebased\", with no commit SHAs and no clear link to the earlier review. A rebased branch already on origin can only be published by a force-push, which overwrites what origin holds, and the approval page could not grant one.",
+    "thesis": "A rebased follow-up now records a `chain-break` fact and opens with a section saying no incremental diff exists, linking the review it replaces and naming the four commits that matter. When origin holds a different commit, approval also offers a force-push that may replace only that recorded commit.",
+    "scope": {
+      "in": [
+        "The build records what origin held for the branch, and a `chain-break` fact when the reviewed head was rewritten away.",
+        "A break section on `review.html`, before the title, in place of the old muted line.",
+        "The break fields carried into the ticket's history and the approval service's packet facts.",
+        "A fourth approval choice, \"Approve and force-push\", bound to the recorded remote head."
+      ],
+      "out": [
+        "Rebuilding a delta across the rewrite (range-diff, patch equivalence) is PER-129.",
+        "Gatekeeper's refusal to force-push when origin has moved already exists (PER-102) and is unchanged.",
+        "The hand-off's tests and its contract and approval docs are not in this commit.",
+        "A base that moved without a rewrite (`base-moved`) is not treated as a break."
+      ]
+    },
+    "sections": [
+      {
+        "id": "noticing-the-break",
+        "heading": "The build notices a rewrite and records what origin holds",
+        "importance": "core",
+        "contribution": "Everything after depends on one fact the build now writes: that the reviewed history was rewritten, and which commit origin holds for the branch.",
+        "body": [
+          {
+            "prose": "A follow-up remembers the packet Ethan last acted on and the head it showed. The build already sorted a broken chain into reasons, and two of them mean history was rewritten: `not-descendant`, where the reviewed head is no longer an ancestor of the new head, and `predecessor-head-missing`, where it is gone from the repository."
+          },
+          {
+            "evidence": [
+              "H-007",
+              "H-017",
+              "H-018",
+              "H-019"
+            ],
+            "explains": "`kk-review-packet.sh` works out the branch name and, on a follow-up, passes `origin/<branch>` and the commit it pointed to when last fetched, without touching the network. `build.clj` accepts the two new flags and hands them to the model as `remote`, with the head left empty when origin has no such branch."
+          },
+          {
+            "evidence": [
+              "H-022",
+              "H-023"
+            ],
+            "explains": "`chain-break` is written only when there is an earlier reviewed packet and the chain reason is one of the two rewrites. It records the reason, the acted-on packet, its reviewed head, and the remote ref and head, so no later step has to work any of them out again."
+          },
+          {
+            "evidence": [
+              "H-020",
+              "H-021"
+            ],
+            "explains": "`chain-break` joins the packet's fixed key order and the list of fields the facts digest covers. The digest is the build's fingerprint of its facts, so neither the writer nor a later edit can change the break record unnoticed."
+          }
+        ],
+        "transition": {
+          "to": "showing-the-break",
+          "text": "A recorded fact helps nobody until Ethan sees it, so the page reads it next."
+        }
+      },
+      {
+        "id": "showing-the-break",
+        "heading": "The page opens on the break, with every commit spelled out",
+        "importance": "core",
+        "contribution": "The old muted line becomes a section Ethan cannot miss, so a rebased packet never passes for an ordinary one.",
+        "body": [
+          {
+            "evidence": [
+              "H-024"
+            ],
+            "explains": "`break-section` says why no diff exists, links the packet Ethan acted on with Ethan's response, and lists four full SHAs: last reviewed head, comparison base, current head, remote head. `break-remote` then says what approval can do: an ordinary push when origin has no branch, nothing extra when origin already holds the head, otherwise an optional force-push over exactly the recorded commit. The muted line is no longer printed on break packets."
+          },
+          {
+            "evidence": [
+              "H-025",
+              "H-026"
+            ],
+            "explains": "The section sits under the packet history and before the title, so it is read before the essay. Its styles reuse the red-edged banner look and let long SHAs wrap on a narrow phone screen."
+          }
+        ],
+        "transition": {
+          "to": "recording-the-break",
+          "text": "The approval service never reads the page; it reads the ticket's history, so the break must be recorded there too."
+        }
+      },
+      {
+        "id": "recording-the-break",
+        "heading": "The ticket's history carries the break to the approval service",
+        "importance": "core",
+        "contribution": "The approval service decides from the ticket's history log, not the page, so the break fields must reach that log and be read back out of it.",
+        "body": [
+          {
+            "evidence": [
+              "H-006",
+              "H-008",
+              "H-001"
+            ],
+            "explains": "When a packet is built, `kk-packet.sh` copies `chain_break`, `remote_ref` and `remote_head` into the `built` event it logs. `kk_ap_fold`, which replays the log into one record per packet, keeps them, and `kk-approval status` returns them in `packet_facts`, the summary the approval service reads."
+          },
+          {
+            "evidence": [
+              "H-005"
+            ],
+            "explains": "The brief sent to the summary writer now says a break packet is a fresh review of rewritten history, not a step from the earlier packet, so the essay Ethan reads agrees with the break section above it."
+          }
+        ],
+        "transition": {
+          "to": "approving-a-force-push",
+          "text": "With the remote head in `packet_facts`, approval can offer a force-push tied to it."
+        }
+      },
+      {
+        "id": "approving-a-force-push",
+        "heading": "A force-push can be approved, but only over the recorded commit",
+        "importance": "core",
+        "contribution": "Ethan can publish a rebased branch that is already on origin, and the push can overwrite only the commit the packet showed.",
+        "body": [
+          {
+            "prose": "A force-push replaces whatever a remote branch points to. `--force-with-lease` is the guarded form: it names the commit the remote must still hold, called the lease, and refuses if it holds anything else. That guard is only as good as the lease, so here the packet fixes it, never the browser."
+          },
+          {
+            "evidence": [
+              "H-009"
+            ],
+            "explains": "`lease` returns the recorded remote head only on a chain break where it differs from the head being approved. `choices` adds \"Approve and force-push\" only when such a lease exists, and its consequence text names the head, the remote ref and the exact commit it replaces."
+          },
+          {
+            "evidence": [
+              "H-010",
+              "H-011",
+              "H-012",
+              "H-013"
+            ],
+            "explains": "The lease is stored with the nonce, a one-time code the service issues with each page view, so on confirmation it comes from the server's copy and anything the browser sends is ignored. A force-push on a confirmation that offered none is refused with 409, and the lease is passed to `kk-packet-approval decide` only for a force-push."
+          },
+          {
+            "evidence": [
+              "H-002",
+              "H-003",
+              "H-004"
+            ],
+            "explains": "`kk-packet-approval` takes an optional thirteenth argument, the lease, and refuses it for any other choice. For a force-push it asks `kk-approval status` and requires this to be the ticket's newest packet, a chain break, with the lease equal to the recorded remote head and different from the head. Only then does it grant `force-push` at that lease."
+          }
+        ]
+      },
+      {
+        "id": "approval-page",
+        "heading": "The approval panel shows the break, the remote head and the lease",
+        "importance": "supporting",
+        "contribution": "Ethan sees what a force-push would overwrite before confirming it, though this page code was never run in a browser.",
+        "body": [
+          {
+            "evidence": [
+              "H-014",
+              "H-015",
+              "H-016"
+            ],
+            "explains": "The panel's facts list gains a chain-break row and the remote head with its ref, and a force-push confirmation adds a line naming the commit the remote must be at. The namespace description now lists the fourth choice."
+          }
+        ]
+      }
+    ],
+    "overview": "The build [notices the rewrite and pins what origin holds](#noticing-the-break) as a fact every later step can only read. From that one record the page [puts the break in front of Ethan](#showing-the-break) with each commit named, while the [ticket's history log](#recording-the-break) carries the same fields to the service that grants pushes. Because the remote head arrives through that log rather than the browser, the [force-push choice](#approving-a-force-push) is bound to it twice: once in the service and again in the script that records the grant. The [approval panel](#approval-page) only displays the lease; it decides nothing."
+  },
+  "files": [
+    {
+      "path": "skills/engineering-manager/scripts/kk-approval.sh",
+      "role": "exposes break fields in `packet_facts`"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet-approval.sh",
+      "role": "grants force-push only at the recorded lease"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-packet.sh",
+      "role": "logs break fields; briefs the writer on breaks"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/kk-review-packet.sh",
+      "role": "records origin's branch head for the build"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/lib/kk-approval.sh",
+      "role": "keeps break fields when replaying history"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/review_feedback/approval.clj",
+      "role": "offers force-push, lease held on the server"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-feedback/ui/review_feedback/approval.cljs",
+      "role": "shows the remote head and lease"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/build.clj",
+      "role": "passes remote ref and head to the model"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/review_packet/model.clj",
+      "role": "adds the `chain-break` fact"
+    },
+    {
+      "path": "skills/engineering-manager/scripts/review-packet/review_packet/render.clj",
+      "role": "draws the break section before the title"
+    }
+  ],
+  "collapsed": [],
+  "risks": [
+    "`remote/head` is origin as last fetched, so a stale fetch gives a stale lease that Gatekeeper refuses, and Ethan must decide again.",
+    "`packet_facts` gained three fields, so anything comparing that object exactly will break.",
+    "A packet built from a bare commit rather than a branch name records no remote, so its page offers no force-push.",
+    "The force-push grant relies on Gatekeeper's existing PER-102 check to refuse when origin has moved, which this commit does not touch."
+  ],
+  "tests": [
+    {
+      "command": "skills/engineering-manager/tests/run-tests.sh",
+      "result": "not-run",
+      "note": "Not run at this commit; at branch head 021a727 it gave 1542 passed and 8 failed, the same 8 that fail on main at afb0c22."
+    },
+    {
+      "result": "not-run",
+      "note": "This diff adds no tests; the hand-off's twelve new checks are not in it."
+    },
+    {
+      "command": "shellcheck",
+      "result": "not-run",
+      "note": "Not on PATH here; the nix build enforces it."
+    },
+    {
+      "result": "not-run",
+      "note": "The `approval.cljs` change was not exercised in a browser or by the Squint checks."
+    }
+  ],
+  "gaps": [
+    "This commit holds no tests and none of the contract or approval docs the hand-off lists.",
+    "The approval panel's new rows and lease line were never run in a browser.",
+    "The new writer-brief line for break packets has no direct test."
+  ]
+}
