@@ -452,6 +452,39 @@ review-feedback (`packets.clj:29-30`, `ui.cljs:120`). Their home depends on D-12
 | `git check-attr linguist-generated` | `generated` class from attributes at head | inside Git adapter | suggested in `ns/model.clj:143-148` |
 | another VCS (jj, hg) | hunks, files | floor | tests whether the protocol is really Git-free |
 
+### 5.5 Candidate consumer: Benchmark Factory
+
+Shahidi et al., “Benchmark Factory: Agentic Benchmark Creation via Dataset
+Curation and Label-Free Quality Anchors” ([arXiv 2611.18890](https://arxiv.org/abs/2611.18890),
+2026) is a useful downstream use case, not a source of core protocol concepts.
+Its meta-agent loop sources candidate tasks from landed production changes,
+runs models of known relative strength, checks label-free quality anchors, and
+repairs queries, prompts, graders, or task configurations when candidates fail.
+For cohorts without fail-to-pass tests, the paper reports an LLM grader scoring
+an agent patch against the landed patch.
+
+Change evidence could make a benchmark produced by that loop inspectable:
+
+- observations: landed and generated patches, test results, trajectories, and
+  grader outputs;
+- claims: for example, that a task separates capability tiers or lies in a
+  desired difficulty band;
+- gaps: absent fail-to-pass tests, uncertain patch equivalence, or incomplete
+  execution evidence;
+- attestations: exact repository revisions, task and grader configurations,
+  model versions, prompts, and evidence digests for each benchmark iteration.
+
+The repair loop is also a concrete lineage test: a consumer should be able to
+identify which evidence and configuration produced each accepted benchmark
+version. This makes Benchmark Factory a candidate motivating example for the
+protocol and, later, a synthetic composable-fragment conformance fixture. Its
+quality anchors remain consumer-level acceptance heuristics; they should not
+become core evidence types or validation rules.
+
+Research status (2026-11-20): arXiv metadata, abstract, and indexed paper
+excerpts were checked; the full paper was not read because direct arXiv fetches
+were unavailable from this host.
+
 ## 6. Unresolved cases
 
 Each was run through the existing tooling unless marked. Fixture:
